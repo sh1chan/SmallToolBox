@@ -16,8 +16,8 @@ Interface:
 - [ ] Generate User Stats
   - [ ] Simple Plot
     - [x] Generate pic
-    - [ ] Cache Generated pic filepath
-      - [ ] Cache will be updated for next the `hour`
+    - [x] Cache Generated pic filepath
+      - [x] Cache will be updated for next the `hour`
     - [ ] Set `stats_limit`
 
 <div align="center">
