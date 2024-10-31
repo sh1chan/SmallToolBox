@@ -1,4 +1,4 @@
-# Issue Tracker: Project Sage0x0
+# Issue Tracker: Project SmallToolBox
 
 Interface:
   - TelegramBot: https://t.me/smalltoolboxbot
