@@ -6,7 +6,6 @@ Interface:
 
 <div align="center">
   <img src="./static/readme/TgBot.png" />
-  <img src="./static/readme/UserStats.jpg" />
 </div>
 
 
@@ -20,3 +19,7 @@ Interface:
     - [ ] Cache Generated pic filepath
       - [ ] Cache will be updated for next the `hour`
     - [ ] Set `stats_limit`
+
+<div align="center">
+  <img src="./static/readme/UserStats.jpg" />
+</div>
