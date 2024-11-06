@@ -4,6 +4,10 @@ Interface:
   - TelegramBot: https://t.me/smalltoolboxbot
     - Main Channel: https://t.me/smalltoolbox
 
+Releases
+- 0.1.0
+  - Commands `uStats`, `cStats`
+
 <div align="center">
   <img src="./static/readme/TgBot.png" />
 </div>
