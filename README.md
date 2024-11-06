@@ -2,7 +2,7 @@
 
 Interface:
   - TelegramBot: https://t.me/smalltoolboxbot
-    - Main Channel: https://t.me/smalltoolbox
+    - Test Group: https://t.me/smalltoolbox
 
 Releases
 - 0.1.0
