@@ -29,7 +29,7 @@ Interface:
 
 #### User Stats
 <div align="center">
-  <img src="./static/readme/ChatStats.jpg" />
+  <img src="./static/readme/UserStats.jpg" />
 </div>
 
 
