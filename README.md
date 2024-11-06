@@ -27,7 +27,13 @@ Interface:
     - [ ] Clear cached data (`date < curr_date - (hours=1)`)
     - [ ] Set `stats_limit`
 
+#### User Stats
 <div align="center">
-  <img src="./static/readme/UserStats.jpg" />
+  <img src="./static/readme/ChatStats.jpg" />
+</div>
+
+
+#### Chat Stats
+<div align="center">
   <img src="./static/readme/ChatStats.jpg" />
 </div>
