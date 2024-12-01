@@ -1,3 +1,6 @@
+### Main Handler
+- [ ] Any Message
+  - [x] Add `dump_private_chat_message` to dump messages via `message.model_dump_json`
 
 #### TODO
 - [x] Move `MessageStats.is_user_admin` into `UserChats`
