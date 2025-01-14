@@ -1,16 +1,19 @@
 # Issue Tracker: Project SmallToolBox
 
+> [!NOTE]
+> Run commands in the Telegram Group\
+> Brief: [Project Diagram and Screenshots](./SCREENSHOTS.md) | [TODO List](./TODO.md)
 
-Interface:
-- TelegramBot: https://t.me/smalltoolboxbot
-  - Test Group: https://t.me/smalltoolbox
+```
+# `matplotlib.pyplot.plot` (image) Generators
+/uStats - Sent Messages count in Chats
+/cStats - Sent Messages and Users count
+```
 
-Specific README
------
-- [SCREENSHOTS](./SCREENSHOTS.md)
-- [TODO](./TODO.md)
+Telegram:
+  - [x] Group: https://t.me/smalltoolbox
+  - [x] Bot: https://t.me/smalltoolboxbot
 
-
-Version 0.1.0
--------------
-- Implemented Commands: `uStats`, `cStats`
+#### Versions
+- **0.1.0**
+  - [x] Implemented Commands: `uStats`, `cStats`
