@@ -1,7 +1,7 @@
-# Issue Tracker: Project SmallToolBox
+# SmallToolBox - Telegram Bot
 
 > [!NOTE]
-> Brief: [Project Diagram and Screenshots](./SCREENSHOTS.md) | [TODO List](./TODO.md)\
+> Brief: [Project Diagram and Screenshots](./readme/SCREENSHOTS.md) | [TODO List](./readme/TODO.md)\
 > Demo: [Telegram Group](https://t.me/smalltoolbox) | [Telegram Bot](https://t.me/smalltoolboxbot)
 
 ```
