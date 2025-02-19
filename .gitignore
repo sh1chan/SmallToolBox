@@ -1,6 +1,7 @@
 *.py[cod]
 *.swp
 *.idea
+*.bkp
 
 .env
 

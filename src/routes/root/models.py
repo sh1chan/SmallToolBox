@@ -25,6 +25,7 @@ class User(Base):
   # Relations
   message_settings: Mapped["UserSettings"] = relationship(back_populates="user")
   messages: Mapped[List["Message"]] = relationship()
+  progress_bar: Mapped[List["ProgressBar"]] = relationship()
 
 
 class UserChat(Base):
@@ -121,3 +122,18 @@ class MessageStats(Base):
   # Relations
   user_id: Mapped[int] = mapped_column(ForeignKey("tgbot_user.id"))
   chat_id: Mapped[int] = mapped_column(ForeignKey("tgbot_chat.id"))
+
+
+class ProgressBar(Base):
+  __tablename__ = "tgbot_progress_bar"
+
+  id: Mapped[int] = mapped_column(primary_key=True)
+
+  name: Mapped[str] = mapped_column()
+  start: Mapped[int] = mapped_column()
+  stop: Mapped[int] = mapped_column()
+  steps: Mapped[int] = mapped_column()
+
+  # Relations
+  user_id: Mapped[int] = mapped_column(ForeignKey("tgbot_user.id"))
+  # TODO: update_strategy

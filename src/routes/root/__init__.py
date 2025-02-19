@@ -36,7 +36,8 @@ async def dump_private_chat_message(message: types.Message):
   )
 
 
-@router.message()
+# TODO: uncomment
+# @router.message()
 async def any_message(message: types.Message):
   """Any Messages
 

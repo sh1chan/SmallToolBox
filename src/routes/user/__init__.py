@@ -38,3 +38,34 @@ async def default_stats(message: Message):
     await message.reply_photo(
       input_file.FSInputFile(report_filepath)
     )
+
+
+@router.message(Command("uProgressBar"))
+async def default_stats(message: Message):
+  user = message.from_user
+  if not user:
+    return await message.reply(template.USERS_ONLY_COMMAND)
+  # TODO
+  # - get all progress / limit 5
+  # - add Pagination buttons
+  # - add Action buttons
+
+  buttons = []
+
+  from aiogram.types import ReplyKeyboardMarkup
+  from aiogram.types.keyboard_button import KeyboardButton
+
+  session_maker = await db.get_session()
+
+  async with session_maker() as session:
+    for pb in await crud.ProgressBar.get(
+      session=session, user_id=user.id,
+    ):
+      buttons.append(
+        KeyboardButton(text=pb.name)
+      )
+
+  await message.reply(
+    text="EE",
+    reply_markup=ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text='fefef')]])
+  )

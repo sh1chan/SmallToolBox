@@ -4,6 +4,7 @@ from itertools import groupby
 from sqlalchemy import select
 
 from . import models
+from src.routes.root import models as root_models
 from src.routes.root.crud import Chat, MessageStats
 
 
@@ -67,3 +68,25 @@ class UserStats:
       all_chats_count=all_chats_count,
       all_messages_count=all_messages_count,
     )
+
+
+class ProgressBar:
+
+  @staticmethod
+  async def get(session, user_id):
+    # FIXME: LIMIT `5`
+    return (await session.execute(
+      select(
+        root_models.ProgressBar
+      ).where(
+        root_models.ProgressBar.user_id == user_id,
+      ).order_by(
+        root_models.ProgressBar.id
+      ).limit(5)
+    )).scalars()
+
+  # @staticmethod
+  # async def insert(
+  #   session, user_id, date, data,
+  #   all_chats_count, all_messages_count,
+  # ):
