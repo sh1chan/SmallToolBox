@@ -75,15 +75,17 @@ class ProgressBar:
   @staticmethod
   async def get(session, user_id):
     # FIXME: LIMIT `5`
-    return (await session.execute(
-      select(
-        root_models.ProgressBar
-      ).where(
-        root_models.ProgressBar.user_id == user_id,
-      ).order_by(
-        root_models.ProgressBar.id
-      ).limit(5)
-    )).scalars()
+    return (
+      await session.scalars(
+        select(
+          root_models.ProgressBar
+        ).where(
+          root_models.ProgressBar.user_id == user_id,
+        ).order_by(
+          root_models.ProgressBar.id
+        ).limit(5)
+      )
+    ).all()
 
   # @staticmethod
   # async def insert(

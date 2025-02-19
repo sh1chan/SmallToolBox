@@ -1,9 +1,9 @@
 import datetime
 
-from aiogram import Router
-from aiogram.types import Message, input_file
-from aiogram.filters import Command
+from aiogram import Router, F, types, filters
+from aiogram.types.keyboard_button import KeyboardButton
 
+from src.core import const
 from src.sql import db
 
 from . import template, stats, crud
@@ -12,8 +12,8 @@ from . import template, stats, crud
 router = Router(name=__name__)
 
 
-@router.message(Command("uStats"))
-async def default_stats(message: Message):
+@router.message(filters.Command("uStats"))
+async def default_stats(message: types.Message):
   user = message.from_user
   if not user:
     return await message.reply(template.USERS_ONLY_COMMAND)
@@ -36,12 +36,27 @@ async def default_stats(message: Message):
       us.report_filepath = report_filepath
       await session.commit()
     await message.reply_photo(
-      input_file.FSInputFile(report_filepath)
+      types.input_file.FSInputFile(report_filepath)
     )
 
 
-@router.message(Command("uProgressBar"))
-async def default_stats(message: Message):
+@router.callback_query(F.data == "ProgressBar:Add")
+async def cal(query: types.CallbackQuery):
+  print('Add')
+
+
+@router.callback_query(F.data.startswith("ProgressBar:Edit:"))
+async def cal(query: types.CallbackQuery):
+  print('Edit')
+
+
+@router.callback_query(F.data.startswith("ProgressBar:SwapStatus:"))
+async def cal(query: types.CallbackQuery):
+  print('Swap')
+
+
+@router.message(filters.Command("uProgressBar"))
+async def default_stats(message: types.Message):
   user = message.from_user
   if not user:
     return await message.reply(template.USERS_ONLY_COMMAND)
@@ -52,9 +67,6 @@ async def default_stats(message: Message):
 
   buttons = []
 
-  from aiogram.types import ReplyKeyboardMarkup
-  from aiogram.types.keyboard_button import KeyboardButton
-
   session_maker = await db.get_session()
 
   async with session_maker() as session:
@@ -62,10 +74,32 @@ async def default_stats(message: Message):
       session=session, user_id=user.id,
     ):
       buttons.append(
-        KeyboardButton(text=pb.name)
+        [
+          types.inline_keyboard_button.InlineKeyboardButton(
+            text=const.EmojiSet.ACTIVE \
+              if pb.is_active else const.EmojiSet.DISABLED,
+            callback_data=f'ProgressBar:SwapStatus:{pb.id}',
+          ),
+          types.inline_keyboard_button.InlineKeyboardButton(
+            text=pb.name,
+            callback_data=f'ProgressBar:Edit:{pb.id}',
+          )
+        ]
       )
 
+  # TODO: pagination
+  buttons.append(
+    [
+      types.inline_keyboard_button.InlineKeyboardButton(
+        text=const.EmojiSet.PLUS,
+        callback_data="ProgressBar:Add"
+      ),
+    ]
+  )
+
   await message.reply(
-    text="EE",
-    reply_markup=ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text='fefef')]])
+    text="ProgressBar List...",
+    reply_markup=types.inline_keyboard_markup.InlineKeyboardMarkup(
+      inline_keyboard=buttons,
+    ),
   )
