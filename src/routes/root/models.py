@@ -133,6 +133,7 @@ class ProgressBar(Base):
   start: Mapped[int] = mapped_column()
   stop: Mapped[int] = mapped_column()
   steps: Mapped[int] = mapped_column()
+  is_active: Mapped[bool] = mapped_column(default=True)
 
   # Relations
   user_id: Mapped[int] = mapped_column(ForeignKey("tgbot_user.id"))
