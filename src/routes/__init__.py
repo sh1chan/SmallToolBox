@@ -2,7 +2,7 @@ from . import root, user, chat
 
 
 routers = [
-  user.router,
-  chat.router,
-  root.router,
+    user.router,
+    chat.router,
+    root.router,
 ]

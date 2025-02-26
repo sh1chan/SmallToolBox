@@ -3,8 +3,8 @@ from dataclasses import dataclass
 
 @dataclass
 class EmojiSet:
-  MINUS = '➖'
-  PLUS = '➕'
-  ACTIVE = '✅'
-  DISABLED = '☑️'
-  DELETE = '🚫'
+    MINUS = "➖"
+    PLUS = "➕"
+    ACTIVE = "✅"
+    DISABLED = "☑️"
+    DELETE = "🚫"

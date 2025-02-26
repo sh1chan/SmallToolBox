@@ -1,4 +1,3 @@
-
 WELCOME = """
 Welcome, {NAME}!
 

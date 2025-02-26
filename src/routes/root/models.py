@@ -1,8 +1,11 @@
 from typing import List, Optional
 
 from sqlalchemy import (
-  ForeignKey, Column,
-  BigInteger, Boolean, String,
+    ForeignKey,
+    Column,
+    BigInteger,
+    Boolean,
+    String,
 )
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
@@ -12,129 +15,135 @@ from src.sql.db import Base
 
 
 class User(Base):
-  """ Telegram User Object
-  """
-  __tablename__ = "tgbot_user"
+    """Telegram User Object"""
 
-  id: Mapped[int] = Column(
-    BigInteger, nullable=False, primary_key=True
-  )
-  username: Mapped[Optional[str]]
-  full_name: Mapped[str]
+    __tablename__ = "tgbot_user"
 
-  # Relations
-  message_settings: Mapped["UserSettings"] = relationship(back_populates="user")
-  messages: Mapped[List["Message"]] = relationship()
-  progress_bar: Mapped[List["ProgressBar"]] = relationship()
+    id: Mapped[int] = Column(BigInteger, nullable=False, primary_key=True)
+    username: Mapped[Optional[str]]
+    full_name: Mapped[str]
+
+    # Relations
+    message_settings: Mapped["UserSettings"] = relationship(
+        back_populates="user",
+    )
+    messages: Mapped[List["Message"]] = relationship()
+    progress_bar: Mapped[List["ProgressBar"]] = relationship()
 
 
 class UserChat(Base):
-  __tablename__ = "tgbot_user_chat"
+    __tablename__ = "tgbot_user_chat"
 
-  id: Mapped[int] = Column(
-    BigInteger, nullable=False, primary_key=True
-  )
+    id: Mapped[int] = Column(BigInteger, nullable=False, primary_key=True)
 
-  is_user_admin: Mapped[bool] = Column(
-    Boolean, nullable=False, server_default="t"
-  )
+    is_user_admin: Mapped[bool] = Column(
+        Boolean,
+        nullable=False,
+        server_default="t",
+    )
 
-  # Relations
-  user_id: Mapped[int] = mapped_column(ForeignKey("tgbot_user.id"))
-  chat_id: Mapped[int] = mapped_column(ForeignKey("tgbot_chat.id"))
+    # Relations
+    user_id: Mapped[int] = mapped_column(ForeignKey("tgbot_user.id"))
+    chat_id: Mapped[int] = mapped_column(ForeignKey("tgbot_chat.id"))
 
 
 class UserSettings(Base):
-  __tablename__ = "tgbot_user_settings"
+    __tablename__ = "tgbot_user_settings"
 
-  id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
 
-  # Settings
-  save_messages: Mapped[bool] = Column(
-    Boolean, nullable=False, server_default='f'
-  )
-  save_stats: Mapped[bool] = Column(
-    Boolean, nullable=False, server_default='t'
-  )
+    # Settings
+    save_messages: Mapped[bool] = Column(
+        Boolean,
+        nullable=False,
+        server_default="f",
+    )
+    save_stats: Mapped[bool] = Column(
+        Boolean,
+        nullable=False,
+        server_default="t",
+    )
 
-  # Relations
-  user_id: Mapped[int] = mapped_column(ForeignKey("tgbot_user.id"))
-  user: Mapped["User"] = relationship(back_populates="message_settings")
+    # Relations
+    user_id: Mapped[int] = mapped_column(ForeignKey("tgbot_user.id"))
+    user: Mapped["User"] = relationship(back_populates="message_settings")
 
 
 class Chat(Base):
-  """ Telegram Chat Object
-  """
-  __tablename__ = "tgbot_chat"
+    """Telegram Chat Object"""
 
-  id: Mapped[int] = Column(
-    BigInteger, nullable=False, primary_key=True
-  )
-  username: Mapped[Optional[str]]
-  full_name: Mapped[str]
+    __tablename__ = "tgbot_chat"
 
-  # Relations
-  message_settings: Mapped["ChatSettings"] = relationship(back_populates="chat")
+    id: Mapped[int] = Column(BigInteger, nullable=False, primary_key=True)
+    username: Mapped[Optional[str]]
+    full_name: Mapped[str]
+
+    # Relations
+    message_settings: Mapped["ChatSettings"] = relationship(
+        back_populates="chat",
+    )
 
 
 class ChatSettings(Base):
-  __tablename__ = "tgbot_chat_settings"
+    __tablename__ = "tgbot_chat_settings"
 
-  id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
 
-  # Settings
-  save_stats: Mapped[bool] = Column(
-    Boolean, nullable=False, server_default='t'
-  )
+    # Settings
+    save_stats: Mapped[bool] = Column(
+        Boolean,
+        nullable=False,
+        server_default="t",
+    )
 
-  # Relations
-  chat_id: Mapped[int] = mapped_column(ForeignKey("tgbot_chat.id"))
-  chat: Mapped["Chat"] = relationship(back_populates="message_settings")
+    # Relations
+    chat_id: Mapped[int] = mapped_column(ForeignKey("tgbot_chat.id"))
+    chat: Mapped["Chat"] = relationship(back_populates="message_settings")
 
 
 class Message(Base):
-  """ Telegram Message Object
-  """
-  __tablename__ = "tgbot_message"
+    """Telegram Message Object"""
 
-  id: Mapped[int] = mapped_column(primary_key=True)
+    __tablename__ = "tgbot_message"
 
-  message_id: Mapped[int]
-  date: Mapped[str]
+    id: Mapped[int] = mapped_column(primary_key=True)
 
-  # Relations
-  user_id: Mapped[int] = mapped_column(ForeignKey("tgbot_user.id"))
-  chat_id: Mapped[int] = mapped_column(ForeignKey("tgbot_chat.id"))
+    message_id: Mapped[int]
+    date: Mapped[str]
+
+    # Relations
+    user_id: Mapped[int] = mapped_column(ForeignKey("tgbot_user.id"))
+    chat_id: Mapped[int] = mapped_column(ForeignKey("tgbot_chat.id"))
 
 
 class MessageStats(Base):
-  __tablename__ = "tgbot_message_stats"
+    __tablename__ = "tgbot_message_stats"
 
-  id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
 
-  message_count: Mapped[int] = Column(
-    BigInteger, nullable=False, server_default="0"
-  )
-  date: Mapped[str] = Column(
-    String, nullable=False
-  )
+    message_count: Mapped[int] = Column(
+        BigInteger,
+        nullable=False,
+        server_default="0",
+    )
+    date: Mapped[str] = Column(String, nullable=False)
 
-  # Relations
-  user_id: Mapped[int] = mapped_column(ForeignKey("tgbot_user.id"))
-  chat_id: Mapped[int] = mapped_column(ForeignKey("tgbot_chat.id"))
+    # Relations
+    user_id: Mapped[int] = mapped_column(ForeignKey("tgbot_user.id"))
+    chat_id: Mapped[int] = mapped_column(ForeignKey("tgbot_chat.id"))
 
 
 class ProgressBar(Base):
-  __tablename__ = "tgbot_progress_bar"
+    __tablename__ = "tgbot_progress_bar"
 
-  id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
 
-  name: Mapped[str] = mapped_column()
-  start: Mapped[int] = mapped_column()
-  stop: Mapped[int] = mapped_column()
-  steps: Mapped[int] = mapped_column()
-  is_active: Mapped[bool] = mapped_column(default=True)
+    name: Mapped[str] = mapped_column()
+    start: Mapped[int] = mapped_column()
+    stop: Mapped[int] = mapped_column()
+    steps: Mapped[int] = mapped_column()
+    is_active: Mapped[bool] = mapped_column(default=True)
 
-  # Relations
-  user_id: Mapped[int] = mapped_column(ForeignKey("tgbot_user.id"))
-  # TODO: update_strategy
+    # Relations
+    user_id: Mapped[int] = mapped_column(ForeignKey("tgbot_user.id"))
+    # TODO: update_strategy
