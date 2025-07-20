@@ -6,8 +6,9 @@ import logging
 import sys
 
 from src.app import bot, dp
-from src.infra.postgres import Postgres
 from src.routes import routers
+from src.infra.kafka import Kafka
+from src.infra.postgres import Postgres
 
 
 async def initialize():
@@ -15,10 +16,12 @@ async def initialize():
 		*routers
 	)
 	await Postgres.initialize()
+	await Kafka.initialize()
 
 
 async def terminate():
 	await Postgres.terminate()
+	await Kafka.terminate()
 
 
 async def main():
