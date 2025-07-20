@@ -27,9 +27,11 @@ async def main():
 
 if __name__ == "__main__":
   logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+
+  runner = asyncio.Runner()
+
   try:
-    asyncio.run(initialize())
-    asyncio.run(main())
-    # asyncio.run(terminate())
-  except Exception:
-    raise
+    runner.run(initialize())
+    runner.run(main())
+  finally:
+    runner.run(terminate())

@@ -33,10 +33,9 @@ async def initialize():
   await engine.dispose()
 
 
-async def terminate():
-  global engine
+async def terminate() -> None:
   if engine is None:
-    raise RuntimeError("Engine not initialized!")
+    return
   await engine.dispose()
 
 
