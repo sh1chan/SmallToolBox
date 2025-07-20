@@ -9,19 +9,23 @@ from src.app import bot, dp
 from src.routes import routers
 from src.infra.kafka import Kafka
 from src.infra.postgres import Postgres
+from src.infra.rabbit import Rabbit
 
 
 async def initialize():
+	await Kafka.initialize()
+	await Rabbit.initialize()
+	await Postgres.initialize()
+
 	dp.include_routers(
 		*routers
 	)
-	await Postgres.initialize()
-	await Kafka.initialize()
 
 
 async def terminate():
-	await Postgres.terminate()
 	await Kafka.terminate()
+	await Rabbit.terminate()
+	await Postgres.terminate()
 
 
 async def main():

@@ -1,18 +1,17 @@
-from aiokafka import AIOKafkaProducer
+from faststream.kafka import KafkaBroker
 
 from src import config
 
 
 class Kafka:
-	producer: AIOKafkaProducer = None
+	broker: KafkaBroker | None = None
 
 	@classmethod
 	async def initialize(cls):
-		cls.producer = AIOKafkaProducer(
+		cls.broker = KafkaBroker(
 			bootstrap_servers=config.env["KAFKA_BOOTSTRAP_SERVERS"]
 		)
-		await cls.producer.start()
 
 	@classmethod
 	async def terminate(cls):
-		await cls.producer.stop()
+		await cls.broker.stop()
