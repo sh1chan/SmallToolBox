@@ -1,8 +1,15 @@
+# TODO (ames0k0)
+# - Remove the `network_mode`
+# - Set the images version
+# - Change the Services and Containers name
+
 services:
+
   broker:
     image: apache/kafka:latest
     container_name: broker
     network_mode: host
+    restart: unless-stopped
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
@@ -19,3 +26,12 @@ services:
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
       KAFKA_CREATE_TOPICS: "STB_EVENTS"
       AUTO_CREATE_TOPICS: "true"
+
+  rabbitmq:
+    image: rabbitmq:latest
+    container_name: rabbitmq
+    network_mode: host
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
