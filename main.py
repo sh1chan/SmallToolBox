@@ -6,32 +6,32 @@ import logging
 import sys
 
 from src.app import bot, dp
-from src.sql import db
+from src.infra import postgres
 from src.routes import routers
 
 
 async def initialize():
-  dp.include_routers(
-    *routers
-  )
-  await db.initialize()
+	dp.include_routers(
+		*routers
+	)
+	await postgres.initialize()
 
 
 async def terminate():
-  await db.terminate()
+	await postgres.terminate()
 
 
 async def main():
-  await dp.start_polling(bot)
+	await dp.start_polling(bot)
 
 
 if __name__ == "__main__":
-  logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+	logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
-  runner = asyncio.Runner()
+	runner = asyncio.Runner()
 
-  try:
-    runner.run(initialize())
-    runner.run(main())
-  finally:
-    runner.run(terminate())
+	try:
+		runner.run(initialize())
+		runner.run(main())
+	finally:
+		runner.run(terminate())
