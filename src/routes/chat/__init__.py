@@ -4,7 +4,7 @@ from aiogram import Router, html
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message, input_file
 
-from src.sql import db
+from src.infra import postgres
 
 from . import template, crud, stats
 
@@ -27,7 +27,7 @@ async def default_stats(message: Message):
   if message.from_user and message.from_user.id == chat.id:
     return await message.reply(template.CHAT_ONLY_COMMAND)
 
-  session_maker = await db.get_session()
+  session_maker = await postgres.get_session()
 
   async with session_maker() as session:
     date = (

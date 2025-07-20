@@ -4,7 +4,7 @@ from aiogram import Router
 from aiogram.types import Message, input_file
 from aiogram.filters import Command
 
-from src.sql import db
+from src.infra.postgres import Postgres
 
 from . import template, stats, crud
 
@@ -18,9 +18,7 @@ async def default_stats(message: Message):
   if not user:
     return await message.reply(template.USERS_ONLY_COMMAND)
 
-  session_maker = await db.get_session()
-
-  async with session_maker() as session:
+  async with Postgres.session_maker() as session:
     date = (
         message.date - datetime.timedelta(hours=1)
     ).strftime("%Y-%m-%d %H")

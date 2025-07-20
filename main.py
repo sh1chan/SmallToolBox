@@ -6,7 +6,7 @@ import logging
 import sys
 
 from src.app import bot, dp
-from src.infra import postgres
+from src.infra.postgres import Postgres
 from src.routes import routers
 
 
@@ -14,11 +14,11 @@ async def initialize():
 	dp.include_routers(
 		*routers
 	)
-	await postgres.initialize()
+	await Postgres.initialize()
 
 
 async def terminate():
-	await postgres.terminate()
+	await Postgres.terminate()
 
 
 async def main():

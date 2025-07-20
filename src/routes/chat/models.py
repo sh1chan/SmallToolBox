@@ -5,7 +5,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 
-from src.sql.db import Base
+from src.infra.postgres import Base
 
 
 class ChatStats(Base):
