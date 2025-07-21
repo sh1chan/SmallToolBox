@@ -1,0 +1,19 @@
+[project]
+name = "stbcore"
+version = "0.1.0"
+description = "Base module for STB"
+authors = [
+    {name = "YóUnǎi",email = "c0d3r.nodiru.gaji@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.9,<4"
+dependencies = [
+    "pydantic (>=2.11.7,<3.0.0)",
+    "faststream[kafka,rabbit,redis] (>=0.5.47,<0.6.0)",
+    "sqlalchemy (>=2.0.41,<3.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
