@@ -8,7 +8,7 @@ from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
-from src.infra.postgres import Base
+from stbcore.models.base import Base
 
 
 class User(Base):

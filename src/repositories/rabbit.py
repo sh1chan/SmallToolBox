@@ -4,19 +4,20 @@ from typing import Self
 
 from aiogram.types import Message
 
-from src.infra.rabbit import Rabbit
+from stbcore.infra.rabbit import Rabbit
 
 
 class RabbitRepositoryProtocol(Protocol):
-  async def get_user_stats(self: Self, message: Message) -> None:
-    ...
+  async def get_user_stats(self: Self, message: Message) -> None: ...
 
 
 class RabbitRepositoryImpl:
+  """
+  """
+
   async def get_user_stats(self: Self, message: Message) -> None:
     """Publishes a message to send a user stats from the cache
     """
-
     await Rabbit.broker.publish(
       message=json.dumps({
         "user_tg_id": message.from_user.id,

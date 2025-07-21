@@ -1,7 +1,8 @@
 from aiogram import Router, html, types
 from aiogram.filters import CommandStart
 
-from src.infra.postgres import Postgres
+from stbcore.infra.postgres import Postgres
+
 from . import template, crud
 
 
