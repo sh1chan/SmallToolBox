@@ -10,7 +10,7 @@ class Redis:
 
 	@classmethod
 	async def initialize(cls: Self) -> None:
-		cls.broker = RedisBroker(url=settings.redis_broker_url)
+		cls.broker = RedisBroker(url=settings.redis.broker_url)
 
 	@classmethod
 	async def terminate(cls: Self) -> None:

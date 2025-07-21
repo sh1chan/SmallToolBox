@@ -10,9 +10,9 @@ class Rabbit:
 
 	@classmethod
 	async def initialize(cls: Self) -> None:
-		cls.broker = RabbitBroker(url=settings.rabbit_broker_url)
+		cls.broker = RabbitBroker(url=settings.rabbit.broker_url)
 		await cls.broker.connect()
 
 	@classmethod
 	async def terminate(cls: Self) -> None:
-		cls.broker.stop()
+		await cls.broker.stop()

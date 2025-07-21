@@ -12,7 +12,7 @@ class Postgres:
 
 	@classmethod
 	async def initialize(cls):
-		cls.engine = create_async_engine(url=settings.postgres_url)
+		cls.engine = create_async_engine(url=settings.postgres.url)
 		cls.session_maker = async_sessionmaker(cls.engine, expire_on_commit=False)
 
 		async with cls.engine.begin() as conn:

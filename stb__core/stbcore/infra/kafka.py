@@ -10,9 +10,9 @@ class Kafka:
 
 	@classmethod
 	async def initialize(cls: Self) -> None:
-		cls.broker = KafkaBroker(bootstrap_servers=settings.kafka_bootstrap_servers)
+		cls.broker = KafkaBroker(bootstrap_servers=settings.kafka.bootstrap_servers)
 		await cls.broker.connect()
 
 	@classmethod
 	async def terminate(cls: Self) -> None:
-		cls.broker.stop()
+		await cls.broker.stop()
