@@ -6,13 +6,13 @@ from stbcore.core.config import settings
 
 
 class Kafka:
-  broker: KafkaBroker | None = None
+	broker: KafkaBroker | None = None
 
-  @classmethod
-  async def initialize(cls: Self) -> None:
-    cls.broker = KafkaBroker(bootstrap_servers=settings.kafka_bootstrap_servers)
-    await cls.broker.connect()
+	@classmethod
+	async def initialize(cls: Self) -> None:
+		cls.broker = KafkaBroker(bootstrap_servers=settings.kafka_bootstrap_servers)
+		await cls.broker.connect()
 
-  @classmethod
-  async def terminate(cls: Self) -> None:
-    cls.broker.stop()
+	@classmethod
+	async def terminate(cls: Self) -> None:
+		cls.broker.stop()

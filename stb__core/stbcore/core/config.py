@@ -3,26 +3,65 @@ from pydantic import RedisDsn
 from pydantic import AmqpDsn
 from pydantic import PostgresDsn
 from pydantic import AnyUrl
+from pydantic import computed_field
+from pydantic_settings import BaseSettings
+from pydantic_settings import SettingsConfigDict
 
 
-class settings(BaseModel):
-	REDIS__BROKER_URL: RedisDsn = "redis://localhost:6379/"
-	RABBIT__BROKER_URL: AmqpDsn = "amqp://guest:guest@localhost:5672/"
-	KAFKA__BOOTSTRAP_SERVERS: AnyUrl = ""
-	POSTGRES__URL: PostgresDsn
+class TGBot(BaseModel):
+	TOKEN: str
 
+	@computed_field
 	@property
-	def redis_broker_url(self):
-		return str(self.REDIS__BROKER_URL)
+	def token(self) -> str:
+		return str(self.TOKEN)
 
-	@property
-	def rabbit_broker_url(self):
-		return str(self.RABBIT__BROKER_URL)
 
-	@property
-	def kafka_bootstrap_servers(self):
-		return str(self.KAFKA__BOOTSTRAP_SERVERS)
+class Redis(BaseModel):
+	BROKER_URL: RedisDsn = "redis://localhost:6379/"
 
+	@computed_field
 	@property
-	def postgres_url(self):
-		return str(self.POSTGRES__URL)
+	def broker_url(self) -> str:
+		return str(self.BROKER_URL)
+
+
+class Rabbit(BaseModel):
+	BROKER_URL: AmqpDsn = "amqp://guest:guest@localhost:5672/"
+
+	@computed_field
+	@property
+	def broker_url(self) -> str:
+		return str(self.BROKER_URL)
+
+
+class Kafka(BaseModel):
+	BOOTSTRAP_SERVERS: AnyUrl
+
+	@computed_field
+	@property
+	def bootstrap_servers(self) -> str:
+		return str(self.BOOTSTRAP_SERVERS)
+
+
+class Postgres(BaseModel):
+	URL: PostgresDsn
+
+	@computed_field
+	@property
+	def url(self) -> str:
+		return str(self.URL)
+
+
+class Settings(BaseSettings):
+	tgbot: TGBot
+	redis: Redis
+	rabbit: Rabbit
+	kafka: Kafka
+	postgres: Postgres
+
+	class Config(SettingsConfigDict):
+		env_nested_delimiter = "__"
+
+
+settings = Settings()
