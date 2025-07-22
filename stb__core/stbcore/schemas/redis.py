@@ -2,4 +2,4 @@ from pydantic import BaseModel
 
 
 class UserStatsCacheSchema(BaseModel):
-	MINIO_OBJECT_DST = str
+	minio_object_name: str
