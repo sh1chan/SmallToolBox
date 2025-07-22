@@ -16,7 +16,7 @@ class Redis:
 
 	@classmethod
 	async def initialize_client(cls: Self) -> None:
-		cls.client = cls.broker.connect()
+		cls.client = await cls.broker.connect()
 
 	@classmethod
 	async def terminate(cls: Self) -> None:
