@@ -18,7 +18,7 @@ router.message.filter(F.from_user)
 
 @router.message(Command("uStats"))
 async def default_stats(message: Message):
-	return await RabbitRepository.get_user_stats(
+	return await RabbitRepository.send_user_stats(
 		message=message,
 	)
 
