@@ -13,8 +13,7 @@ from stbcore.infra.redis import Redis
 from stbcore.infra.rabbit import Rabbit
 from stbcore.infra.minio import Minio
 
-from repositories.redis import RedisRepository
-from repositories.rabbit import RabbitRepository
+from services.user_stats import UserStatsService
 
 
 async def initialize():
@@ -43,15 +42,9 @@ async def main():
 
 	@app.broker.subscriber(RabbitRoutingKeysEnum.TG_MESSAGES__USER_STATS)
 	async def send_user_stats(payload: GenerateUserStatsInSchema) -> None:
-		"""Sending user stats
+		"""Sending user stats from the cache
 		"""
-		print(f"Trying to send a user stats for: {payload.user_tg_id=}")
-		cache = await RedisRepository.get_user_stats(user_tg_id=payload.user_tg_id)
-		print(f'{cache=}')
-
-		if not cache:
-			await RabbitRepository.generate_user_stats(payload=payload.user_tg_id)
-			return 
+		return await UserStatsService.send_user_stats(payload=payload)
 
 	await app.run()
 

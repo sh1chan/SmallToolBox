@@ -6,6 +6,12 @@ from stbcore.infra.rabbit import Rabbit
 from stbcore.schemas.rabbit import GenerateUserStatsInSchema
 
 
+__all__ = (
+	"RabbitRepository",
+	"RabbitRepositoryProtocol",
+)
+
+
 class RabbitRepositoryProtocol(Protocol):
 	async def generagte_user_stats(self: Self, payload: GenerateUserStatsInSchema) -> None: ...
 

@@ -1527,7 +1527,7 @@ optional = false
 python-versions = ">=3.9,<4"
 groups = ["dev"]
 files = []
-develop = false
+develop = true
 
 [package.dependencies]
 aiogram = ">=3.21.0,<4.0.0"
@@ -1845,4 +1845,4 @@ propcache = ">=0.2.1"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.9,<4.0"
-content-hash = "f75875d9df19d07a7c0fd132f86d58b775c317e6e3b8d66b5b178ae63a778dce"
+content-hash = "3cba9c3abecea5b800ebfae510ec0b3c2b58669e3bbae2f1104ba6b4457b7c9f"
