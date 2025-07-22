@@ -35,3 +35,13 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: user
       RABBITMQ_DEFAULT_PASS: password
+
+  redis:
+    image: redis:latest
+    hostname: redis
+    restart: always
+    network_mode: host
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_DB: 0
