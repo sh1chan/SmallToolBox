@@ -14,8 +14,9 @@ from stbcore.infra.kafka import Kafka
 from stbcore.infra.rabbit import Rabbit
 from stbcore.infra.postgres import Postgres
 from stbcore.infra.minio import Minio
+from stbcore.infra.aiogram import Aiogram
 
-from src.app import bot, dp
+from src.app import dispatcher
 from src.routes import routers
 
 
@@ -27,9 +28,10 @@ async def initialize():
 
 	# Sync
 	Minio.initialize()
+	Aiogram.initialize()
 
 	# Routers
-	dp.include_routers(
+	dispatcher.include_routers(
 		*routers
 	)
 
@@ -42,9 +44,10 @@ async def terminate():
 
 	# Sync
 	Minio.terminate()
+	Aiogram.terminate()
 
 async def main():
-	await dp.start_polling(bot)
+	await dispatcher.start_polling(Aiogram.bot)
 
 
 if __name__ == "__main__":

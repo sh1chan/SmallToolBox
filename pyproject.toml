@@ -13,8 +13,10 @@ python-dotenv = "^1.0.1"
 sqlalchemy = {extras = ["asyncio"], version = "^2.0.36"}
 asyncpg = "^0.30.0"
 matplotlib = "^3.9.2"
-faststream = {extras = ["kafka", "rabbit"], version = "^0.5.47"}
 
+
+[tool.poetry.group.dev.dependencies]
+stbcore = {path = "stb__core"}
 
 [build-system]
 requires = ["poetry-core"]
