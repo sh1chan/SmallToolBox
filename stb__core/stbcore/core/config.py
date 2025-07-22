@@ -53,12 +53,34 @@ class Postgres(BaseModel):
 		return str(self.URL)
 
 
+class Minio(BaseModel):
+	ENDPOINT: str
+	ACCESS_KEY: str
+	SECRET_KEY: str
+
+	@computed_field
+	@property
+	def endpoint(self) -> str:
+		return str(self.ENDPOINT)
+
+	@computed_field
+	@property
+	def access_key(self) -> str:
+		return str(self.ACCESS_KEY)
+
+	@computed_field
+	@property
+	def secret_key(self) -> str:
+		return str(self.SECRET_KEY)
+
+
 class Settings(BaseSettings):
 	tgbot: TGBot
 	redis: Redis
 	rabbit: Rabbit
 	kafka: Kafka
 	postgres: Postgres
+	minio: Minio
 
 	class Config(SettingsConfigDict):
 		env_nested_delimiter = "__"

@@ -2,6 +2,7 @@
 # - Remove the `network_mode`
 # - Set the images version
 # - Change the Services and Containers name
+# - Add Volumes
 
 services:
 
@@ -45,3 +46,10 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_DB: 0
+
+  minio:
+    image: quay.io/minio/minio:latest
+    network_mode: host
+    restart: unless-stopped
+    container_name: minio
+    command: ["minio", "server", "data"]
