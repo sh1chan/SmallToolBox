@@ -18,7 +18,7 @@ class TGBot(BaseModel):
 
 
 class Redis(BaseModel):
-	BROKER_URL: RedisDsn = "redis://localhost:6379/"
+	BROKER_URL: RedisDsn
 
 	@computed_field
 	@property
@@ -27,7 +27,7 @@ class Redis(BaseModel):
 
 
 class Rabbit(BaseModel):
-	BROKER_URL: AmqpDsn = "amqp://guest:guest@localhost:5672/"
+	BROKER_URL: AmqpDsn
 
 	@computed_field
 	@property
