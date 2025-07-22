@@ -8,11 +8,11 @@ if not os.environ.get("IS_IN_PRODUCTION_MODE"):
 from faststream import FastStream
 
 from stbcore.core.enums import RabbitRoutingKeysEnum
+from stbcore.schemas.rabbit import GenerateUserStatsInSchema
 from stbcore.infra.redis import Redis
 from stbcore.infra.rabbit import Rabbit
 from stbcore.infra.minio import Minio
 
-import schemas
 from repositories.redis import RedisRepository
 from repositories.rabbit import RabbitRepository
 
@@ -42,8 +42,8 @@ async def main():
 	app = FastStream(broker=Rabbit.broker)
 
 	@app.broker.subscriber(RabbitRoutingKeysEnum.TG_MESSAGES__USER_STATS)
-	async def send_user_stats(payload: schemas.UserStatsIn) -> None:
-		"""Subscribed to the user stats command
+	async def send_user_stats(payload: GenerateUserStatsInSchema) -> None:
+		"""Sending user stats
 		"""
 		print(f"Trying to send a user stats for: {payload.user_tg_id=}")
 		cache = await RedisRepository.get_user_stats(user_tg_id=payload.user_tg_id)
