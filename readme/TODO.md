@@ -4,7 +4,7 @@
     - [ ] Add InlineButton to change dump options (`unset`, `none`, `defaults`)
 
 ### TODO
-#### Infra
+#### Infrastructure
 - [ ] Kafka
   - [x] Init
 - [ ] Rabbit
@@ -18,6 +18,7 @@
 - [ ] Aiogram
   - [x] Init
 
+#### Functionality
 - [x] Move `MessageStats.is_user_admin` into `UserChats`
   - [x] Create Table
   - [ ] Add user info
