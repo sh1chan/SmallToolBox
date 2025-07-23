@@ -29,6 +29,7 @@ class UserStatsRepositoryImpl:
 
 	def generate(self: Self, hourly_user_stats: UserStats | None) -> io.BytesIO:
 		buf = io.BytesIO()
+		draw_legend: bool = False
 
 		if not hourly_user_stats:
 			plt.title(f"Chats=0, Messages=0")
@@ -38,7 +39,6 @@ class UserStatsRepositoryImpl:
 				color=f"C0",
 			)
 		else:
-			plt.legend(title="")
 			plt.title(
 				f"Chats={hourly_user_stats.chats_count}, Messages={hourly_user_stats.messages_count}"
 			)
@@ -52,6 +52,10 @@ class UserStatsRepositoryImpl:
 					HOURS, messages_count,
 					color=f"C{cid}", label=chat_name,
 				)
+				draw_legend = True
+
+		if draw_legend:
+			plt.legend(title="")
 
 		plt.grid(axis="y")
 		plt.xlabel("24-hour clock")
