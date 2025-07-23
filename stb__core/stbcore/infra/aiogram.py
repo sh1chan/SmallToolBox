@@ -19,4 +19,4 @@ class Aiogram:
 
 	@classmethod
 	async def terminate(cls: Self) -> None:
-		cls.bot.close()
+		await cls.bot.close()
