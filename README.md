@@ -30,3 +30,9 @@ poetry run python main.py
 #### Versions
 - **0.1.0**
   - [x] Implemented Commands: `uStats`, `cStats`
+
+---
+
+<p align="center">
+  <img src="./readme/static/logs.png" />
+</p>

@@ -7,14 +7,29 @@
 #### Infrastructure
 - [ ] Kafka
   - [x] Init
+  - [x] Docker service
+    - [x] Healthcheck
+    - [ ] CPU/MEM Usage
 - [ ] Rabbit
   - [x] Init
+  - [x] Docker service
+    - [x] Healthcheck
+    - [ ] CPU/MEM Usage
 - [ ] Redis
   - [x] Init
+  - [x] Docker service
+    - [ ] Healthcheck
+    - [ ] CPU/MEM Usage
 - [ ] Postgres
   - [x] Init
+  - [ ] Docker service
+    - [ ] Healthcheck
+    - [ ] CPU/MEM Usage
 - [ ] Minio
   - [x] Init
+  - [x] Docker service
+    - [ ] Healthcheck
+    - [ ] CPU/MEM Usage
 - [ ] Aiogram
   - [x] Init
 
