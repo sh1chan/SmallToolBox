@@ -12,6 +12,7 @@ from stbcore.schemas.rabbit import GenerateUserStatsInSchema
 from stbcore.infra.redis import Redis
 from stbcore.infra.rabbit import Rabbit
 from stbcore.infra.minio import Minio
+from stbcore.infra.aiogram import Aiogram
 
 from services.user_stats import UserStatsService
 
@@ -20,9 +21,9 @@ async def initialize():
 	# Async
 	await Redis.initialize()
 	await Redis.initialize_client()
-
 	await Rabbit.initialize()
 	await Rabbit.broker.start()
+	await Aiogram.initialize()
 
 	# Sync
 	Minio.initialize()
@@ -32,6 +33,7 @@ async def terminate():
 	# Async
 	await Redis.terminate()
 	await Rabbit.terminate()
+	await Aiogram.terminate()
 	
 	# Sync
 	Minio.terminate()
