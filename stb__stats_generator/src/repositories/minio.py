@@ -1,3 +1,4 @@
+import io
 from typing import Protocol
 from typing import Self
 
@@ -15,7 +16,7 @@ class MinioRepositoryProtocol(Protocol):
 	"""
 	"""
 
-	def create_user_stats_file(self: Self, filename: str, file_in_bytes: bytes) -> None:	...
+	def create_user_stats_file(self: Self, filename: str, file_in_bytes: io.BytesIO) -> None:	...
 
 	def delete_user_stats_file(self: Self, filename: str) -> None:	...
 
@@ -24,16 +25,20 @@ class MinioRepositoryImpl:
 	"""
 	"""
 
-	def create_user_stats_file(self: Self, filename: str, file_as_bytes: bytes) -> None:
+	def create_user_stats_file(self: Self, filename: str, file_as_bytes: io.BytesIO) -> None:
+		file_length = file_as_bytes.getbuffer().nbytes
+		file_as_bytes.seek(0)
+
 		Minio.client.put_object(
-			bucket_name=MinioBucketsEmum.user_stats,
+			bucket_name=MinioBucketsEmum.userstats,
 			object_name=filename,
 			data=file_as_bytes,
+			length=file_length,
 		)
 
 	def delete_user_stats_file(self: Self, filename: str) -> None:
 		Minio.client.remove_object(
-			bucket_name=MinioBucketsEmum.user_stats,
+			bucket_name=MinioBucketsEmum.userstats,
 			object_name=filename
 		)
 

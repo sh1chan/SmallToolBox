@@ -57,8 +57,9 @@ class UserStatsServiceImpl:
 			- Rabbit.send
 		"""
 		now = datetime.datetime.now()
+
 		hourly_stats_date = (
-			now.date - now.timedelta(hours=1)
+			now - datetime.timedelta(hours=1)
 		).strftime(
 			format="%Y-%m-%d %H"
 		)
@@ -70,6 +71,11 @@ class UserStatsServiceImpl:
 		if hourly_user_stats:
 			self.minio_repository.delete_user_stats_file(filename=hourly_user_stats.report_filepath)
 			# await self.postgres_repository.delete_hourly_user_stats(user_stats_id=hourly_user_stats.id)
+		else:
+			hourly_user_stats = await self.postgres_repository.create_hourly_user_stats(
+				user_tg_id=payload.user_tg_id,
+				hourly_stats_date=hourly_stats_date,
+			)
 
 		filename = f"user_stats_{hourly_stats_date}.png"
 
@@ -80,12 +86,15 @@ class UserStatsServiceImpl:
 		MinioRepository.create_user_stats_file(
 			filename=filename, file_as_bytes=user_stats_file_as_bytes,
 		)
-		PostgresRepository.update_user_stats_filename(
+
+		await PostgresRepository.update_user_stats_filename(
 			user_stats_id=hourly_user_stats.id,
 			filename=filename,
 		)
-		RedisRepository.create_user_stats_cache(
+
+		await RedisRepository.create_user_stats_cache(
 			payload=UserStatsCacheSchema(
+				user_tg_id=payload.user_tg_id,
 				minio_object_name=filename,
 			),
 		)
@@ -94,16 +103,6 @@ class UserStatsServiceImpl:
 		await RabbitRepository.send_user_stats(
 			payload=payload,
 		)
-
-		# else:
-		# 	us = await us_crud.generate(session, user.id, date)
-		# 	report_filepath = stats.default(us)
-		# 	us.report_filepath = report_filepath
-		# 	await session.commit()
-
-		# await message.reply_photo(
-		# 	input_file.FSInputFile(report_filepath)
-		# )
 
 
 def get_user_stats_service() -> UserStatsServiceProtocol:

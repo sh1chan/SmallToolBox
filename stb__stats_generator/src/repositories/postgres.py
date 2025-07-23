@@ -67,10 +67,16 @@ class PostgresRepositoryImpl:
 			user_tg_id: PositiveInt,
 			hourly_stats_date: str
 	) -> UserStats:
-		hourly_message_stats = self.read_hourly_message_stats(
-			user_tg_id=user_tg_id,
-			ourly_stats_date=hourly_stats_date
+		hourly_user_stats = UserStats(
+			user_id=user_tg_id,
+			date=hourly_stats_date,
+			report_filepath="Fake",
 		)
+		async with Postgres.session_maker() as session:
+			session.add(hourly_user_stats)
+			await session.commit()
+			await session.refresh(hourly_user_stats)
+		return hourly_user_stats
 
 	async def read_hourly_user_stats(
 			self: Self,
