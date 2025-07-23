@@ -33,7 +33,6 @@ async def terminate():
 	# Async
 	await Redis.terminate()
 	await Rabbit.terminate()
-	await Aiogram.terminate()
 	
 	# Sync
 	Minio.terminate()
