@@ -11,6 +11,7 @@ if not os.environ.get("IS_IN_PRODUCTION_MODE"):
 	load_dotenv(find_dotenv())
 
 from stbcore.infra.kafka import Kafka
+from stbcore.infra.redis import Redis
 from stbcore.infra.rabbit import Rabbit
 from stbcore.infra.postgres import Postgres
 from stbcore.infra.minio import Minio
@@ -23,6 +24,7 @@ from src.routes import routers
 async def initialize():
 	# Async
 	await Kafka.initialize()
+	await Redis.initialize()
 	await Rabbit.initialize()
 	await Postgres.initialize()
 
@@ -39,6 +41,7 @@ async def initialize():
 async def terminate():
 	# Async
 	await Kafka.terminate()
+	await Redis.initialize()
 	await Rabbit.terminate()
 	await Postgres.terminate()
 
