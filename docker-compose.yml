@@ -61,7 +61,7 @@ services:
     container_name: stb__core
     restart: unless-stopped
 
-  stb__tg_messsages:
+  stb__tg_messages:
     build:
       context: stb__tg_messages
     image: stb__tg_messages:v0.1.0
@@ -69,4 +69,17 @@ services:
     network_mode: host
     restart: unless-stopped
     depends_on:
+      - rabbitmq
       - stb__core
+
+  stb__stats_generator:
+    build:
+      context: stb__stats_generator
+    image: stb__stats_generator:v0.1.0
+    container_name: stb__stats_generator
+    network_mode: host
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      - stb__tg_messages

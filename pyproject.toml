@@ -17,6 +17,7 @@ matplotlib = "^3.9.2"
 
 [tool.poetry.group.dev.dependencies]
 stbcore = {path = "stb__core", develop = true}
+pip-tools = "^7.4.1"
 
 [build-system]
 requires = ["poetry-core"]
