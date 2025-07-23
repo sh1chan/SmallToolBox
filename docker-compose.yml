@@ -53,3 +53,20 @@ services:
     restart: unless-stopped
     container_name: minio
     command: ["minio", "server", "data"]
+
+  stb__core:
+    build:
+      context: stb__core
+    image: stb__core:v0.1.0
+    container_name: stb__core
+    restart: unless-stopped
+
+  stb__tg_messsages:
+    build:
+      context: stb__tg_messages
+    image: stb__tg_messages:v0.1.0
+    container_name: stb__tg_messages
+    network_mode: host
+    restart: unless-stopped
+    depends_on:
+      - stb__core
