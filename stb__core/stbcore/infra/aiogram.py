@@ -11,12 +11,12 @@ class Aiogram:
 	bot: Bot | None = None
 
 	@classmethod
-	def initialize(cls: Self) -> None:
+	async def initialize(cls: Self) -> None:
 		cls.bot = Bot(
 			token=settings.tgbot.token,
 			default=DefaultBotProperties(parse_mode=ParseMode.HTML)
 		)
 
 	@classmethod
-	def terminate(cls: Self) -> None:
+	async def terminate(cls: Self) -> None:
 		cls.bot.close()

@@ -9,7 +9,7 @@ class RabbitRoutingKeysEnum(StrEnum):
 
 
 class MinioBucketsEmum(StrEnum):
-	user_stats = auto()
+	userstats = auto()
 
 
 class RedisCacheNamesEnum(str, Enum):
