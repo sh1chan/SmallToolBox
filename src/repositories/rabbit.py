@@ -5,6 +5,7 @@ from aiogram.types import Message
 
 from stbcore.core.enums import RabbitRoutingKeysEnum
 from stbcore.infra.rabbit import Rabbit
+from stbcore.schemas.rabbit import GenerateUserStatsInSchema
 
 
 class RabbitRepositoryProtocol(Protocol):
@@ -19,9 +20,10 @@ class RabbitRepositoryImpl:
     """Publishes a message to send a user stats from the cache
     """
     await Rabbit.broker.publish(
-      message={
-        "user_tg_id": message.from_user.id,
-      },
+      message=GenerateUserStatsInSchema(
+        user_tg_id=message.from_user.id,
+        message_tg_id=message.message_id,
+      ),
       routing_key=RabbitRoutingKeysEnum.TG_MESSAGES__USER_STATS,
     )
 
