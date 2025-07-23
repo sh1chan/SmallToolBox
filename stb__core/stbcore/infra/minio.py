@@ -3,6 +3,7 @@ from typing import Self
 import minio
 
 from stbcore.core.config import settings
+from stbcore.core.enums import MinioBucketsEmum
 
 
 class Minio:
@@ -17,6 +18,7 @@ class Minio:
 			secure=False,
 			cert_check=False,
 		)
+		cls.client.make_bucket(MinioBucketsEmum.userstats)
 
 	@classmethod
 	def terminate(cls: Self) -> None:	...
