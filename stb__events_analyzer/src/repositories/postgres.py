@@ -431,5 +431,5 @@ def get_postgres_repository() -> PostgresRepositoryProtocol:
 
 UserRepository = get_user_repository()
 ChatRepository = get_chat_repository()
-MessageRepository = get_chat_repository()
+MessageRepository = get_message_repository()
 PostgresRepository = get_postgres_repository()
