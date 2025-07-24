@@ -29,7 +29,10 @@ class User(Base):
 	full_name: Mapped[str]
 
 	# Relations
-	message_settings: Mapped["UserSettings"] = relationship(back_populates="user")
+	message_settings: Mapped["UserSettings"] = relationship(
+		back_populates="user",
+		lazy="selectin",
+	)
 	messages: Mapped[List["Message"]] = relationship()
 
 

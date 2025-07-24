@@ -23,7 +23,10 @@ class Chat(Base):
 	full_name: Mapped[str]
 
 	# Relations
-	message_settings: Mapped["ChatSettings"] = relationship(back_populates="chat")
+	message_settings: Mapped["ChatSettings"] = relationship(
+		back_populates="chat",
+		lazy="selectin",
+	)
 
 
 class ChatSettings(Base):
