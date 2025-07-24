@@ -5,7 +5,8 @@ from aiogram.types import Message
 
 from stbcore.schemas.rabbit import GenerateUserStatsInSchema
 
-from repositories.rabbit import RabbitRepositoryProtocol
+from .rabbit import RabbitRepository
+from .rabbit import RabbitRepositoryProtocol
 
 
 class UserRepositoryProtocol(Protocol):
@@ -42,7 +43,9 @@ class UserRepositoryImpl:
 
 
 def get_user_repository() -> UserRepositoryProtocol:
-	return UserRepositoryImpl()
+	return UserRepositoryImpl(
+		rabbit_repository=RabbitRepository,
+	)
 
 
 UserRepository = get_user_repository()
