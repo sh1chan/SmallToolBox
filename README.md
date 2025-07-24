@@ -34,5 +34,6 @@ poetry run python main.py
 ---
 
 <p align="center">
+  <img src="./readme/static/Diagram.drawio.png" />
   <img src="./readme/static/logs.png" />
 </p>
