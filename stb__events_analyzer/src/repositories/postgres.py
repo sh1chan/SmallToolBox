@@ -70,7 +70,7 @@ class MessageRepositoryImpl:
 			date: str,
 			session: AsyncSession,
 	) -> MessageStats:
-		""" Returns created but not committed `MessageStats`
+		"""
 		"""
 		message_stats = MessageStats(
 			user_id=user_id,
@@ -78,6 +78,7 @@ class MessageRepositoryImpl:
 			date=date,
 		)
 		session.add(message_stats)
+		await session.commit()
 
 		return message_stats
 
@@ -89,7 +90,7 @@ class MessageRepositoryImpl:
 	) -> MessageStats | None:
 		"""
 		"""
-		return session.scalar(
+		return await session.scalar(
 			select(
 				MessageStats
 			).where(
@@ -105,15 +106,15 @@ class MessageRepositoryImpl:
 			date: str,
 			session: AsyncSession,
 	) -> MessageStats:
-		""" Returns not committed MessageStats
 		"""
-		message_stats = self.read_message_stats(
+		"""
+		message_stats = await self.read_message_stats(
 			user_id=user_id,
 			chat_id=chat_id,
 			session=session
 		)
 		if not message_stats:
-			message_stats = self.create_message_stats(
+			message_stats = await self.create_message_stats(
 				user_id=user_id,
 				chat_id=chat_id,
 				date=date,
@@ -131,7 +132,7 @@ class MessageRepositoryImpl:
 	) -> None:
 		"""
 		"""
-		message_stats = self.init_message_stats(
+		message_stats = await self.init_message_stats(
 			user_id=user_id,
 			chat_id=chat_id,
 			date=date,
@@ -146,7 +147,7 @@ class UserRepositoryProtocol(Protocol):
 	"""
 
 	async def create_user(
-	 		self: Self,
+			self: Self,
 			user_tg_id: PositiveInt,
 			session: AsyncSession,
 	) -> User:	...
@@ -175,6 +176,7 @@ class UserRepositoryImpl:
 	"""
 
 	async def create_user(
+			self: Self,
 			user_tg_id: PositiveInt,
 			session: AsyncSession,
 	) -> User:
@@ -215,15 +217,15 @@ class UserRepositoryImpl:
 	) -> User:
 		"""
 		"""
-		user = self.read_user(user_tg_id=user_tg_id, session=session)
+		user = await self.read_user(user_tg_id=user_tg_id, session=session)
 		if user:
 			return user
 
-		user = self.create_user(
+		user = await self.create_user(
 			user_tg_id=user_tg_id,
 			session=session,
 		)
-		self.create_user_settings(
+		await self.create_user_settings(
 			user_id=user.id,
 			session=session,
 		)
@@ -236,7 +238,7 @@ class ChatRepositoryProtocol(Protocol):
 	"""
 
 	async def create_chat(
-	 		self: Self,
+			self: Self,
 			chat_tg_id: NegativeInt,
 			session: AsyncSession,
 	) -> Chat:	...
@@ -265,6 +267,7 @@ class ChatRepositoryImpl:
 	"""
 
 	async def create_chat(
+			self: Self,
 			chat_tg_id: NegativeInt,
 			session: AsyncSession,
 	) -> Chat:
@@ -289,7 +292,7 @@ class ChatRepositoryImpl:
 		session.add(ChatSettings(chat_id=chat_id))
 		await session.commit()
 
-	async def read_user(
+	async def read_chat(
 			self: Self,
 			chat_tg_id: NegativeInt,
 			session: AsyncSession,
@@ -305,15 +308,15 @@ class ChatRepositoryImpl:
 	) -> Chat:
 		"""
 		"""
-		chat = self.read_chat(chat_tg_id=chat_tg_id, session=session)
+		chat = await self.read_chat(chat_tg_id=chat_tg_id, session=session)
 		if chat:
 			return chat
 
-		chat = self.create_chat(
+		chat = await self.create_chat(
 			chat_tg_id=chat_tg_id,
 			session=session,
 		)
-		self.create_chat_settings(
+		await self.create_chat_settings(
 			chat_id=chat.id,
 			session=session,
 		)
@@ -371,7 +374,7 @@ class PostgresRepositoryImpl:
 		"""
 		"""
 		async with Postgres.session_maker() as session:
-			return self.user_repository.init_user(
+			return await self.user_repository.init_user(
 				user_tg_id=user_tg_id,
 				session=session,
 			)
@@ -381,7 +384,7 @@ class PostgresRepositoryImpl:
 			chat_tg_id: NegativeInt,
 	) -> Chat:
 		async with Postgres.session_maker() as session:
-			return self.chat_repository.init_chat(
+			return await self.chat_repository.init_chat(
 				chat_tg_id=chat_tg_id,
 				session=session,
 			)
