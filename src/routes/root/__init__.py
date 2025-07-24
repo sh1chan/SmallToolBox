@@ -1,9 +1,8 @@
 from aiogram import Router, html, types
 from aiogram.filters import CommandStart
 
-from stbcore.infra.postgres import Postgres
-
-from . import template, crud
+from src.repositories.root import RootRepository
+from . import template
 
 
 router = Router(name=__name__)
@@ -49,13 +48,9 @@ async def any_message(message: types.Message):
 		- check chat_message_settings
 			- save_stats
 	"""
-	user = message.from_user
-	chat = message.chat
-
-	if chat.type == "private":
+	if message.chat.type == "private":
 		return await dump_private_chat_message(message=message)
 
-	async with Postgres.session_maker() as session:
-		await crud.MessageSettings.apply(
-			session, user, chat, message
-		)
+	await RootRepository.register_message(
+		message=message,
+	)
