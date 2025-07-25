@@ -1,5 +1,7 @@
 from typing import Protocol
 from typing import Self
+from typing import AsyncGenerator
+from contextlib import asynccontextmanager
 
 from pydantic import PositiveInt
 from pydantic import NegativeInt
@@ -328,80 +330,18 @@ class PostgresRepositoryProtocol(Protocol):
 	"""
 	"""
 
-	def __init__(
-			self: Self,
-			user_repository: UserRepositoryProtocol,
-			chat_repository: ChatRepositoryProtocol,
-			message_repository: MessageRepositoryProtocol,
-	) -> None:	...
-
-	async def init_user(
-			self: Self,
-			user_tg_id: PositiveInt,
-	) -> User:	...
-
-	async def init_chat(
-			self: Self,
-			chat_tg_id: NegativeInt,
-	) -> Chat:	...
-
-	async def update_message_stats(
-			self: Self,
-			user_id: PositiveInt,
-			chat_id: NegativeInt,
-			date: str,
-	) -> None:	...
+	async def session_context() -> AsyncGenerator[AsyncSession, None]:	...
 
 
 class PostgresRepositoryImpl:
 	"""
 	"""
 
-	def __init__(
-			self: Self,
-			user_repository: UserRepositoryProtocol,
-			chat_repository: ChatRepositoryProtocol,
-			message_repository: MessageRepositoryProtocol,
-	) -> None:
-		self.user_repository = user_repository
-		self.chat_repository = chat_repository
-		self.message_repository = message_repository
-
-	async def init_user(
-			self: Self,
-			user_tg_id: PositiveInt,
-	) -> User:
-		"""
-		"""
+	@staticmethod
+	@asynccontextmanager
+	async def session_context() -> AsyncGenerator[AsyncSession, None]:
 		async with Postgres.session_maker() as session:
-			return await self.user_repository.init_user(
-				user_tg_id=user_tg_id,
-				session=session,
-			)
-
-	async def init_chat(
-			self: Self,
-			chat_tg_id: NegativeInt,
-	) -> Chat:
-		async with Postgres.session_maker() as session:
-			return await self.chat_repository.init_chat(
-				chat_tg_id=chat_tg_id,
-				session=session,
-			)
-
-	async def update_message_stats(
-			self: Self,
-			user_id: PositiveInt,
-			chat_id: NegativeInt,
-			date: str,
-	) -> None:
-		async with Postgres.session_maker() as session:
-			await self.message_repository.update_message_stats(
-				user_id=user_id,
-				chat_id=chat_id,
-				date=date,
-				session=session,
-			)
+			yield session
 
 
 def get_user_repository() -> UserRepositoryProtocol:
@@ -425,11 +365,7 @@ def get_message_repository() -> MessageRepositoryProtocol:
 def get_postgres_repository() -> PostgresRepositoryProtocol:
 	"""
 	"""
-	return PostgresRepositoryImpl(
-		user_repository=UserRepository,
-		chat_repository=ChatRepository,
-		message_repository=MessageRepository,
-	)
+	return PostgresRepositoryImpl()
 
 
 UserRepository = get_user_repository()

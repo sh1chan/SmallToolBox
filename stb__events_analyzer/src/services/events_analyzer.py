@@ -3,8 +3,8 @@ from typing import Self
 
 from stbcore.schemas.kafka import MessageEventSchema
 
-from repositories.postgres import PostgresRepositoryProtocol
-from repositories.postgres import PostgresRepository
+from repositories.events_analyzer import EventsAnalyzerRepository
+from repositories.events_analyzer import EventsAnalyzerRepositoryProtocol
 
 
 class EventsAnalyzerServiceProtocol(Protocol):
@@ -13,7 +13,7 @@ class EventsAnalyzerServiceProtocol(Protocol):
 
 	def __init__(
 			self: Self,
-			postgres_repository: PostgresRepositoryProtocol,
+			events_analyzer_repository: EventsAnalyzerRepositoryProtocol,
 	) -> None:	...
 
 	async def message_events_analyzer(
@@ -24,13 +24,21 @@ class EventsAnalyzerServiceProtocol(Protocol):
 
 class EventsAnalyzerServiceImpl:
 	"""
+	MessageStats
+		-> User
+			-> UserSettings
+				-> UserStats
+				-> Message
+		-> Chat
+			-> ChatSettings
+				-> ChatStats
 	"""
 
 	def __init__(
 			self: Self,
-			postgres_repository: PostgresRepositoryProtocol,
+			events_analyzer_repository: EventsAnalyzerRepositoryProtocol,
 	) -> None:
-		self.postgres_repository = postgres_repository
+		self.events_analyzer_repository = events_analyzer_repository
 
 	async def message_events_analyzer(
 			self: Self,
@@ -38,32 +46,16 @@ class EventsAnalyzerServiceImpl:
 	) -> None:
 		""" Updated the MessageStats, UserStats
 		"""
-		if payload.user_tg_id == payload.chat_tg_id:
-			return
-
-		user = await self.postgres_repository.init_user(
-			user_tg_id=payload.user_tg_id,
+		await self.events_analyzer_repository.message_events_analyzer(
+			payload=payload,
 		)
-		chat = await self.postgres_repository.init_chat(
-			chat_tg_id=payload.chat_tg_id,
-		)
-
-		if any((
-			user.message_settings.save_stats,
-			chat.message_settings.save_stats,
-		)):
-			await self.postgres_repository.update_message_stats(
-				user_id=user.id,
-				chat_id=chat.id,
-				date=payload.date,
-			)
 
 
 def get_events_analyzer_repository() -> EventsAnalyzerServiceProtocol:
 	"""
 	"""
 	return EventsAnalyzerServiceImpl(
-		postgres_repository=PostgresRepository,
+		events_analyzer_repository=EventsAnalyzerRepository,
 	)
 
 
