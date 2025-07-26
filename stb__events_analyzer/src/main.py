@@ -8,7 +8,7 @@ if not os.environ.get("IS_IN_PRODUCTION_MODE"):
 from faststream import FastStream
 
 from stbcore.core.enums import KafkaTopicsEnum
-from stbcore.schemas.kafka import MessageEventSchema
+from stbcore.schemas.kafka import TelegramMessageEventSchema
 from stbcore.infra.kafka import Kafka
 from stbcore.infra.postgres import Postgres
 
@@ -35,7 +35,7 @@ async def main():
 	app = FastStream(broker=Kafka.broker)
 
 	@app.broker.subscriber(KafkaTopicsEnum.STB_EVENTS)
-	async def message_events_analyzer(payload: MessageEventSchema) -> None:
+	async def message_events_analyzer(payload: TelegramMessageEventSchema) -> None:
 		"""Analyzes the message events
 		"""
 		return await EventsAnalyzerService.message_events_analyzer(

@@ -1,7 +1,7 @@
 from typing import Protocol
 from typing import Self
 
-from stbcore.schemas.kafka import MessageEventSchema
+from stbcore.schemas.kafka import TelegramMessageEventSchema
 
 from repositories.events_analyzer import EventsAnalyzerRepository
 from repositories.events_analyzer import EventsAnalyzerRepositoryProtocol
@@ -18,7 +18,7 @@ class EventsAnalyzerServiceProtocol(Protocol):
 
 	async def message_events_analyzer(
 			self: Self,
-			payload: MessageEventSchema,
+			payload: TelegramMessageEventSchema,
 	) -> None:	...
 
 
@@ -34,7 +34,7 @@ class EventsAnalyzerServiceImpl:
 
 	async def message_events_analyzer(
 			self: Self,
-			payload: MessageEventSchema,
+			payload: TelegramMessageEventSchema,
 	) -> None:
 		""" Updated the MessageStats, UserStats
 		"""
