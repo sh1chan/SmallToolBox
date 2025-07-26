@@ -7,6 +7,7 @@ from pydantic import PositiveInt
 from pydantic import NegativeInt
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 
 from stbcore.infra.postgres import Postgres
 from stbcore.models.user import User
@@ -100,13 +101,13 @@ class MessageStatsRepositoryImpl:
 	) -> MessageStats:
 		"""
 		"""
-		message_stats = await self.read_message_stats(
+		message_stats = await self.read(
 			user_id=user_id,
 			chat_id=chat_id,
 			session=session
 		)
 		if not message_stats:
-			message_stats = await self.create_message_stats(
+			message_stats = await self.create(
 				user_id=user_id,
 				chat_id=chat_id,
 				date=date,
@@ -205,7 +206,15 @@ class UserRepositoryImpl:
 	) -> User | None:
 		"""
 		"""
-		return await session.get(entity=User, ident=user_tg_id)
+		return await session.scalar(
+			select(
+				User,
+			).where(
+				User.id == user_tg_id,
+			).options(
+				selectinload(User.message_settings),
+			)
+		)
 
 	async def init(
 	 		self: Self,
@@ -227,7 +236,7 @@ class UserRepositoryImpl:
 			session=session,
 		)
 
-		return user
+		return await self.read(user_tg_id=user_tg_id, session=session)
 
 
 class ChatSettingsRepositoryProtocol(Protocol):
@@ -262,7 +271,7 @@ class ChatRepositoryProtocol(Protocol):
 	"""
 	"""
 
-	async def __init__(
+	def __init__(
 			self: Self,
 			chat_settings_repository: ChatSettingsRepositoryProtocol,
 	) -> None:	...
@@ -290,7 +299,7 @@ class ChatRepositoryImpl:
 	"""
 	"""
 
-	async def __init__(
+	def __init__(
 			self: Self,
 			chat_settings_repository: ChatSettingsRepositoryProtocol,
 	) -> None:
@@ -319,7 +328,15 @@ class ChatRepositoryImpl:
 	) -> Chat | None:
 		"""
 		"""
-		return await session.get(entity=Chat, ident=chat_tg_id)
+		return await session.scalar(
+			select(
+				Chat,
+			).where(
+				Chat.id == chat_tg_id,
+			).options(
+				selectinload(Chat.message_settings),
+			)
+		)
 
 	async def init(
 	 		self: Self,
@@ -341,7 +358,7 @@ class ChatRepositoryImpl:
 			session=session,
 		)
 
-		return chat
+		return await self.read(chat_tg_id=chat_tg_id, session=session)
 
 
 class PostgresRepositoryProtocol(Protocol):
@@ -353,6 +370,7 @@ class PostgresRepositoryProtocol(Protocol):
 			user_repository: UserRepositoryProtocol,
 			chat_repository: ChatRepositoryProtocol,
 			chat_settings_repository: ChatSettingsRepositoryProtocol,
+			message_stats_repository: MessageStatsRepositoryProtocol,
 	) -> None:	...
 
 	async def session_context() -> AsyncGenerator[AsyncSession, None]:	...
@@ -375,10 +393,12 @@ class PostgresRepositoryImpl:
 			user_repository: UserRepositoryProtocol,
 			chat_repository: ChatRepositoryProtocol,
 			chat_settings_repository: ChatSettingsRepositoryProtocol,
+			message_stats_repository: MessageStatsRepositoryProtocol,
 	) -> None:
 		self.user_repository = user_repository
 		self.chat_repository = chat_repository
 		self.chat_settings_repository = chat_settings_repository
+		self.message_stats_repository = message_stats_repository
 
 	@staticmethod
 	@asynccontextmanager
@@ -395,7 +415,7 @@ class PostgresRepositoryImpl:
 	) -> None:
 		"""
 		"""
-		message_stats = await self.init_message_stats(
+		message_stats = await self.message_stats_repository.init(
 			user_id=user_id,
 			chat_id=chat_id,
 			date=date,
@@ -416,7 +436,7 @@ def get_user_repository() -> UserRepositoryProtocol:
 def get_user_settings_repository() -> UserSettingsRepositoryProtocol:
 	"""
 	"""
-	return UserSettingsRepository()
+	return UserSettingsRepositoryImpl()
 
 
 def get_chat_repository() -> ChatRepositoryProtocol:
@@ -446,12 +466,13 @@ def get_postgres_repository() -> PostgresRepositoryProtocol:
 		user_repository=UserRepository,
 		chat_repository=ChatRepository,
 		chat_settings_repository=ChatSettingsRepository,
+		message_stats_repository=MessageStatsRepository,
 	)
 
 
-UserRepository = get_user_repository()
 UserSettingsRepository = get_user_settings_repository()
-ChatRepository = get_chat_repository()
+UserRepository = get_user_repository()
 ChatSettingsRepository = get_chat_settings_repository()
+ChatRepository = get_chat_repository()
 MessageStatsRepository = get_message_repository()
 PostgresRepository = get_postgres_repository()

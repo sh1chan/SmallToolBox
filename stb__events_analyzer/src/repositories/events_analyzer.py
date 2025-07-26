@@ -5,12 +5,12 @@ from stbcore.schemas.kafka import MessageEventSchema
 
 from .postgres import PostgresRepository
 from .postgres import PostgresRepositoryProtocol
-from .postgres import UserRepository
 from .postgres import UserRepositoryProtocol
-from .postgres import ChatRepository
+from .postgres import UserRepository
 from .postgres import ChatRepositoryProtocol
-from .postgres import MessageRepository
-from .postgres import MessageRepositoryProtocol
+from .postgres import ChatRepository
+from .postgres import MessageStatsRepositoryProtocol
+from .postgres import MessageStatsRepository
 
 
 class EventsAnalyzerRepositoryProtocol(Protocol):
@@ -22,7 +22,7 @@ class EventsAnalyzerRepositoryProtocol(Protocol):
 			postgres_repository: PostgresRepositoryProtocol,
 			user_repository: UserRepositoryProtocol,
 			chat_repository: ChatRepositoryProtocol,
-			message_repository: MessageRepositoryProtocol,
+			message_stats_repository: MessageStatsRepositoryProtocol,
 	) -> None:	...
 
 	async def message_events_analyzer(
@@ -40,12 +40,12 @@ class EventsAnalyzerRepositoryImpl:
 			postgres_repository: PostgresRepositoryProtocol,
 			user_repository: UserRepositoryProtocol,
 			chat_repository: ChatRepositoryProtocol,
-			message_repository: MessageRepositoryProtocol,
+			message_stats_repository: MessageStatsRepositoryProtocol,
 	) -> None:
 		self.postgres_repository = postgres_repository
 		self.user_repository = user_repository
 		self.chat_repository = chat_repository
-		self.message_repository = message_repository
+		self.message_stats_repository = message_stats_repository
 
 	async def message_events_analyzer(
 			self: Self,
@@ -63,11 +63,11 @@ class EventsAnalyzerRepositoryImpl:
 			return
 
 		async with self.postgres_repository.session_context() as session:
-			user = await self.user_repository.init_user(
+			user = await self.user_repository.init(
 				user_tg_id=payload.user_tg_id,
 				session=session,
 			)
-			chat = await self.chat_repository.init_chat(
+			chat = await self.chat_repository.init(
 				chat_tg_id=payload.chat_tg_id,
 				session=session,
 			)
@@ -95,6 +95,9 @@ def get_events_analyzer_repository() -> EventsAnalyzerRepositoryProtocol:
 	"""
 	return EventsAnalyzerRepositoryImpl(
 		postgres_repository=PostgresRepository,
+		user_repository=UserRepository,
+		chat_repository=ChatRepository,
+		message_stats_repository=MessageStatsRepository,
 	)
 
 
