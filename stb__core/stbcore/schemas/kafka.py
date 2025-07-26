@@ -3,8 +3,24 @@ from pydantic import PositiveInt
 from pydantic import NegativeInt
 
 
-class MessageEventSchema(BaseModel):
-	user_tg_id: PositiveInt
-	chat_tg_id: NegativeInt
-	message_tg_id: PositiveInt
+class TelegramUserObjectSchema(BaseModel):
+	tg_id: PositiveInt
+	username: str | None
+	full_name: str
+
+
+class TelegramChatObjectSchema(BaseModel):
+	tg_id: NegativeInt
+	username: str | None
+	full_name: str
+
+
+class TelegramMessageObjectSchema(BaseModel):
+	tg_id: PositiveInt
 	date: str
+
+
+class TelegramMessageEventSchema(BaseModel):
+	user: TelegramUserObjectSchema
+	chat: TelegramChatObjectSchema
+	message: TelegramMessageObjectSchema
