@@ -9,8 +9,6 @@ from .postgres import UserRepositoryProtocol
 from .postgres import UserRepository
 from .postgres import ChatRepositoryProtocol
 from .postgres import ChatRepository
-from .postgres import MessageStatsRepositoryProtocol
-from .postgres import MessageStatsRepository
 
 
 class EventsAnalyzerRepositoryProtocol(Protocol):
@@ -22,7 +20,6 @@ class EventsAnalyzerRepositoryProtocol(Protocol):
 			postgres_repository: PostgresRepositoryProtocol,
 			user_repository: UserRepositoryProtocol,
 			chat_repository: ChatRepositoryProtocol,
-			message_stats_repository: MessageStatsRepositoryProtocol,
 	) -> None:	...
 
 	async def message_events_analyzer(
@@ -40,12 +37,10 @@ class EventsAnalyzerRepositoryImpl:
 			postgres_repository: PostgresRepositoryProtocol,
 			user_repository: UserRepositoryProtocol,
 			chat_repository: ChatRepositoryProtocol,
-			message_stats_repository: MessageStatsRepositoryProtocol,
 	) -> None:
 		self.postgres_repository = postgres_repository
 		self.user_repository = user_repository
 		self.chat_repository = chat_repository
-		self.message_stats_repository = message_stats_repository
 
 	async def message_events_analyzer(
 			self: Self,
@@ -97,7 +92,6 @@ def get_events_analyzer_repository() -> EventsAnalyzerRepositoryProtocol:
 		postgres_repository=PostgresRepository,
 		user_repository=UserRepository,
 		chat_repository=ChatRepository,
-		message_stats_repository=MessageStatsRepository,
 	)
 
 
