@@ -98,3 +98,16 @@ services:
     depends_on:
       - stb__tg_messages
       - minio
+
+  stb__events_analyzer:
+    build:
+      context: stb__events_analyzer
+    image: stb__events_analyzer:v0.1.0
+    container_name: stb__events_analyzer
+    network_mode: host
+    restart: unless-stopped
+    env_file:
+      - .env
+    # depends_on:
+    #   broker:
+    #     condition: service_healthy
