@@ -24,14 +24,6 @@ class EventsAnalyzerServiceProtocol(Protocol):
 
 class EventsAnalyzerServiceImpl:
 	"""
-	MessageStats
-		-> User
-			-> UserSettings
-				-> UserStats
-				-> Message
-		-> Chat
-			-> ChatSettings
-				-> ChatStats
 	"""
 
 	def __init__(

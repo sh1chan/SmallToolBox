@@ -5,7 +5,12 @@ from stbcore.schemas.kafka import MessageEventSchema
 
 from .postgres import PostgresRepository
 from .postgres import PostgresRepositoryProtocol
-
+from .postgres import UserRepository
+from .postgres import UserRepositoryProtocol
+from .postgres import ChatRepository
+from .postgres import ChatRepositoryProtocol
+from .postgres import MessageRepository
+from .postgres import MessageRepositoryProtocol
 
 
 class EventsAnalyzerRepositoryProtocol(Protocol):
@@ -15,6 +20,9 @@ class EventsAnalyzerRepositoryProtocol(Protocol):
 	def __init__(
 			self: Self,
 			postgres_repository: PostgresRepositoryProtocol,
+			user_repository: UserRepositoryProtocol,
+			chat_repository: ChatRepositoryProtocol,
+			message_repository: MessageRepositoryProtocol,
 	) -> None:	...
 
 	async def message_events_analyzer(
@@ -29,15 +37,27 @@ class EventsAnalyzerRepositoryImpl:
 
 	def __init__(
 			self: Self,
-			postgres_repository: PostgresRepositoryProtocol
+			postgres_repository: PostgresRepositoryProtocol,
+			user_repository: UserRepositoryProtocol,
+			chat_repository: ChatRepositoryProtocol,
+			message_repository: MessageRepositoryProtocol,
 	) -> None:
 		self.postgres_repository = postgres_repository
+		self.user_repository = user_repository
+		self.chat_repository = chat_repository
+		self.message_repository = message_repository
 
 	async def message_events_analyzer(
 			self: Self,
 			payload: MessageEventSchema,
 	) -> None:
 		"""
+		MessageStats
+			-> User
+				-> UserSettings
+					-> Message
+			-> Chat
+				-> ChatSettings
 		"""
 		if payload.user_tg_id == payload.chat_tg_id:
 			return
@@ -52,13 +72,17 @@ class EventsAnalyzerRepositoryImpl:
 				session=session,
 			)
 
+			if user.message_settings.save_messages:
+				# TODO (ames0k0): Implement
+				pass
+
 			if not any((
 				user.message_settings.save_stats,
 				chat.message_settings.save_stats,
 			)):
 				return
 
-			await self.message_repository.update_message_stats(
+			await self.postgres_repository.update_message_stats(
 				user_id=user.id,
 				chat_id=chat.id,
 				date=payload.date,
