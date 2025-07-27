@@ -16,7 +16,7 @@ class UserRepositoryProtocol(Protocol):
 	def __init__(
 			self: Self,
 			rabbit_repository: RabbitRepositoryProtocol
-	):	...
+	) -> None:	...
 
 	async def send_user_stats(self: Self, message: Message) -> None: ...
 
@@ -28,7 +28,7 @@ class UserRepositoryImpl:
 	def __init__(
 			self: Self,
 			rabbit_repository: RabbitRepositoryProtocol,
-	):
+	) -> None:
 		self.rabbit_repository = rabbit_repository
 
 	async def send_user_stats(self: Self, message: Message) -> None:
@@ -43,6 +43,8 @@ class UserRepositoryImpl:
 
 
 def get_user_repository() -> UserRepositoryProtocol:
+	"""
+	"""
 	return UserRepositoryImpl(
 		rabbit_repository=RabbitRepository,
 	)
