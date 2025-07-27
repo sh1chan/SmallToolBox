@@ -108,6 +108,68 @@ class MessageStatsRepositoryImpl:
 		return message_stats
 
 
+class MessageRepositoryProtocol(Protocol):
+	"""
+	"""
+
+	def __init__(
+			self: Self,
+			message_stats_repository: MessageStatsRepositoryProtocol,
+	) -> None:	...
+
+	async def create(
+			self: Self,
+			payload: TelegramMessageEventSchema,
+			session: AsyncSession,
+	) -> None:	...
+
+	async def init_message_stats(
+			self: Self,
+			payload: TelegramMessageEventSchema,
+			session: AsyncSession,
+	) -> MessageStats:	...
+
+
+class MessageRepositoryImpl:
+	"""
+	"""
+
+	def __init__(
+			self: Self,
+			message_stats_repository: MessageStatsRepositoryProtocol,
+	) -> None:
+		self.message_stats_repository = message_stats_repository
+
+	async def create(
+			self: Self,
+			payload: TelegramMessageEventSchema,
+			session: AsyncSession,
+	) -> None:
+		"""
+		"""
+		session.add(
+			Message(
+				message_id=payload.message.tg_id,
+				date=payload.message.date,
+				user_id=payload.user.tg_id,
+				chat_id=payload.chat.tg_id,
+			)
+		)
+		await session.commit()
+
+	async def init_message_stats(
+			self: Self,
+			payload: TelegramMessageEventSchema,
+			session: AsyncSession,
+	) -> MessageStats:
+		"""
+		"""
+		return await self.message_stats_repository.init(
+			payload=payload,
+			session=session,
+		)
+
+
 class UserSettingsRepositoryProtocol(Protocol):
 	"""
 	"""
@@ -380,6 +442,12 @@ class PostgresRepositoryProtocol(Protocol):
 			session: AsyncSession,
 	) -> Chat:	...
 
+	async def create_message(
+			self: Self,
+			payload: TelegramMessageEventSchema,
+			session: AsyncSession,
+	) -> None:	...
+
 	async def update_message_stats(
 			self: Self,
 			payload: TelegramMessageEventSchema,
@@ -395,11 +463,11 @@ class PostgresRepositoryImpl:
 			self: Self,
 			user_repository: UserRepositoryProtocol,
 			chat_repository: ChatRepositoryProtocol,
-			message_stats_repository: MessageStatsRepositoryProtocol,
+			message_repository: MessageRepositoryProtocol,
 	) -> None:
 		self.user_repository = user_repository
 		self.chat_repository = chat_repository
-		self.message_stats_repository = message_stats_repository
+		self.message_repository = message_repository
 
 	@staticmethod
 	@asynccontextmanager
@@ -431,6 +499,16 @@ class PostgresRepositoryImpl:
 			session=session,
 		)
 
+	async def create_message(
+			self: Self,
+			payload: TelegramMessageEventSchema,
+			session: AsyncSession,
+	) -> None:
+		await self.message_repository.create(
+			payload=payload,
+			session=session,
+		)
+
 	async def update_message_stats(
 			self: Self,
 			payload: TelegramMessageEventSchema,
@@ -438,7 +516,7 @@ class PostgresRepositoryImpl:
 	) -> None:
 		"""
 		"""
-		message_stats = await self.message_stats_repository.init(
+		message_stats = await self.message_repository.init_message_stats(
 			payload=payload,
 			session=session,
 		)
@@ -474,10 +552,18 @@ def get_chat_settings_repository() -> ChatSettingsRepositoryProtocol:
 	return ChatSettingsRepositoryImpl()
 
 
-def get_message_repository() -> MessageStatsRepositoryProtocol:
+def get_message_stats_repository() -> MessageStatsRepositoryProtocol:
 	"""
 	"""
 	return MessageStatsRepositoryImpl()
+
+
+def get_message_repository() -> MessageRepositoryProtocol:
+	"""
+	"""
+	return MessageRepositoryImpl(
+		message_stats_repository=MessageStatsRepository,
+	)
 
 
 def get_postgres_repository() -> PostgresRepositoryProtocol:
@@ -486,7 +572,7 @@ def get_postgres_repository() -> PostgresRepositoryProtocol:
 	return PostgresRepositoryImpl(
 		user_repository=UserRepository,
 		chat_repository=ChatRepository,
-		message_stats_repository=MessageStatsRepository,
+		message_repository=MessageRepository,
 	)
 
 
@@ -494,5 +580,6 @@ UserSettingsRepository = get_user_settings_repository()
 UserRepository = get_user_repository()
 ChatSettingsRepository = get_chat_settings_repository()
 ChatRepository = get_chat_repository()
-MessageStatsRepository = get_message_repository()
+MessageStatsRepository = get_message_stats_repository()
+MessageRepository = get_message_repository()
 PostgresRepository = get_postgres_repository()

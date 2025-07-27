@@ -5,10 +5,6 @@ from stbcore.schemas.kafka import TelegramMessageEventSchema
 
 from .postgres import PostgresRepository
 from .postgres import PostgresRepositoryProtocol
-from .postgres import UserRepositoryProtocol
-from .postgres import UserRepository
-from .postgres import ChatRepositoryProtocol
-from .postgres import ChatRepository
 
 
 class EventsAnalyzerRepositoryProtocol(Protocol):
@@ -41,12 +37,12 @@ class EventsAnalyzerRepositoryImpl:
 			payload: TelegramMessageEventSchema,
 	) -> None:
 		"""
-		MessageStats
-			-> User
-				-> UserSettings
-					-> Message
-			-> Chat
-				-> ChatSettings
+		-> User
+			-> UserSettings
+				-> Message
+		-> Chat
+			-> ChatSettings
+		-> MessageStats
 		"""
 		if payload.user.tg_id == payload.chat.tg_id:
 			return
@@ -62,8 +58,10 @@ class EventsAnalyzerRepositoryImpl:
 			)
 
 			if user.message_settings.save_messages:
-				# TODO (ames0k0): Implement
-				pass
+				await self.postgres_repository.create_message(
+					payload=payload,
+					session=session,
+				)
 
 			if not any((
 				user.message_settings.save_stats,

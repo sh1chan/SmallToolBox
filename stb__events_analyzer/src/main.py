@@ -38,7 +38,7 @@ async def main():
 	async def message_events_analyzer(payload: TelegramMessageEventSchema) -> None:
 		"""Analyzes the message events
 		"""
-		return await EventsAnalyzerService.message_events_analyzer(
+		await EventsAnalyzerService.message_events_analyzer(
 			payload=payload,
 		)
 

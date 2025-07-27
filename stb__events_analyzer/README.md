@@ -1,13 +1,9 @@
 # Telegram Events Analyzer
 
-Saves `User`, `Chat`, `Message`, `MessageStats`
+Creates
+  - [x] `User`
+  - [x] `Chat`
+  - [x] `Message`
 
-### TODO
-- [ ] User
-  - [x] Init
-  - [ ] `username`, `full_name`
-- [ ] Chat
-  - [x] Init
-  - [ ] `username`, `full_name`
-- [ ] Message
-- [x] MessageStats
+Updates
+  - [x] `MessageStats`
