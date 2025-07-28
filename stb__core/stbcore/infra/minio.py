@@ -18,7 +18,8 @@ class Minio:
 			secure=False,
 			cert_check=False,
 		)
-		cls.client.make_bucket(MinioBucketsEmum.userstats)
+		if not cls.client.bucket_exists(MinioBucketsEmum.userstats):
+			cls.client.make_bucket(MinioBucketsEmum.userstats)
 
 	@classmethod
 	def terminate(cls: Self) -> None:	...
