@@ -1,4 +1,5 @@
 import datetime
+import logging
 from typing import Protocol
 from typing import Self
 
@@ -55,40 +56,47 @@ class UserStatsServiceImpl:
 			- Postgres.update
 			- Redis.cache
 			- Rabbit.send
+
+		Read UserStats
+		Read MessageStats
+		Calculate
+			-> Create / Update UserStats
+		Generate
 		"""
-		now = datetime.datetime.now()
-
-		hourly_stats_date = (
-			now - datetime.timedelta(hours=1)
-		).strftime(
-			format="%Y-%m-%d %H"
+		# TODO (ames0k0): Load `date` from `payload`
+		date = datetime.datetime.today().strftime(
+			"%Y-%m-%d %H"
 		)
+		stats_date, _ = date.split()
 
-		hourly_user_stats: UserStats | None = await self.postgres_repository.read_hourly_user_stats(
+		user_stats = await self.postgres_repository.read_user_stats(
 			user_tg_id=payload.user_tg_id,
-			hourly_stats_date=hourly_stats_date,
+			date=stats_date,
 		)
-		if hourly_user_stats:
-			self.minio_repository.delete_user_stats_file(filename=hourly_user_stats.report_filepath)
-			# await self.postgres_repository.delete_hourly_user_stats(user_stats_id=hourly_user_stats.id)
-		else:
-			hourly_user_stats = await self.postgres_repository.create_hourly_user_stats(
-				user_tg_id=payload.user_tg_id,
-				hourly_stats_date=hourly_stats_date,
+		if user_stats:
+			self.minio_repository.delete_user_stats_file(
+				filename=user_stats.report_filepath,
 			)
 
-		filename = f"user_stats_{hourly_stats_date}.png"
+		user_stats = await self.postgres_repository.create_user_stats(
+			user_tg_id=payload.user_tg_id,
+			date=stats_date,
+			user_stats=user_stats,
+		)
+
+		filename = f"user_stats_{stats_date}.png"
 
 		user_stats_file_as_bytes = self.user_stats_repository.generate(
-			hourly_user_stats=hourly_user_stats,
+			user_stats=user_stats,
 		)
 
 		MinioRepository.create_user_stats_file(
-			filename=filename, file_as_bytes=user_stats_file_as_bytes,
+			filename=filename,
+			file_as_bytes=user_stats_file_as_bytes,
 		)
 
 		await PostgresRepository.update_user_stats_filename(
-			user_stats_id=hourly_user_stats.id,
+			user_stats_id=user_stats.id,
 			filename=filename,
 		)
 

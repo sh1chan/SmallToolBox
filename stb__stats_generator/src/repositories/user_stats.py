@@ -20,18 +20,20 @@ class UserStatsRepositoryProtocol(Protocol):
 	"""
 	"""
 
-	def generate(self: Self, hourly_user_stats: UserStats | None) -> io.BytesIO:	...
+	def generate(self: Self, user_stats: UserStats | None) -> io.BytesIO:	...
 
 
 class UserStatsRepositoryImpl:
 	"""
 	"""
 
-	def generate(self: Self, hourly_user_stats: UserStats | None) -> io.BytesIO:
+	def generate(self: Self, user_stats: UserStats | None) -> io.BytesIO:
+		"""
+		"""
 		buf = io.BytesIO()
 		draw_legend: bool = False
 
-		if not hourly_user_stats:
+		if not user_stats:
 			plt.title(f"Chats=0, Messages=0")
 			plt.plot(
 				HOURS,
@@ -40,9 +42,9 @@ class UserStatsRepositoryImpl:
 			)
 		else:
 			plt.title(
-				f"Chats={hourly_user_stats.chats_count}, Messages={hourly_user_stats.messages_count}"
+				f"Chats={user_stats.chats_count}, Messages={user_stats.messages_count}"
 			)
-			for cid, chat_data in enumerate(hourly_user_stats.data.values()):
+			for cid, chat_data in enumerate(user_stats.data.values()):
 				chat_name = chat_data["chat_name"]
 				messages_count = []
 				for hour in HOURS:
