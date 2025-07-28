@@ -58,6 +58,7 @@ class MessageStatsRepositoryImpl:
 	async def create(
 			self: Self,
 			payload: TelegramMessageEventSchema,
+			date: str,
 			session: AsyncSession,
 	) -> MessageStats:
 		"""
@@ -65,7 +66,7 @@ class MessageStatsRepositoryImpl:
 		message_stats = MessageStats(
 			user_id=payload.user.tg_id,
 			chat_id=payload.chat.tg_id,
-			date=payload.message.date,
+			date=date,
 		)
 		session.add(message_stats)
 		await session.commit()
@@ -75,6 +76,7 @@ class MessageStatsRepositoryImpl:
 	async def read(
 			self: Self,
 			payload: TelegramMessageEventSchema,
+			date: str,
 			session: AsyncSession,
 	) -> MessageStats | None:
 		"""
@@ -85,6 +87,7 @@ class MessageStatsRepositoryImpl:
 			).where(
 				MessageStats.user_id == payload.user.tg_id,
 				MessageStats.chat_id == payload.chat.tg_id,
+				MessageStats.date == date,
 			)
 		)
 
@@ -95,17 +98,23 @@ class MessageStatsRepositoryImpl:
 	) -> MessageStats:
 		"""
 		"""
+		date = payload.message.date.split(
+			sep=":",
+			maxsplit=1,
+		)[0]
 		message_stats = await self.read(
 			payload=payload,
+			date=date,
 			session=session
 		)
-		if not message_stats:
-			message_stats = await self.create(
-				payload=payload,
-				session=session,
-			)
+		if message_stats:
+			return message_stats
 
-		return message_stats
+		return await self.create(
+			payload=payload,
+			date=date,
+			session=session,
+		)
 
 
 class MessageRepositoryProtocol(Protocol):
@@ -271,7 +280,7 @@ class UserRepositoryImpl:
 		)
 
 	async def init(
-	 		self: Self,
+			self: Self,
 			payload: TelegramUserObjectSchema,
 			session: AsyncSession,
 	) -> User:
@@ -394,7 +403,7 @@ class ChatRepositoryImpl:
 		)
 
 	async def init(
-	 		self: Self,
+			self: Self,
 			payload: TelegramChatObjectSchema,
 			session: AsyncSession,
 	) -> Chat:
