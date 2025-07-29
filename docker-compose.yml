@@ -28,7 +28,7 @@ services:
       KAFKA_CREATE_TOPICS: "STB_EVENTS"
       AUTO_CREATE_TOPICS: "true"
     healthcheck:
-      test: ["CMD", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server broker:9092"]
+      test: ["CMD", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -108,6 +108,6 @@ services:
     restart: unless-stopped
     env_file:
       - .env
-    # depends_on:
-    #   broker:
-    #     condition: service_healthy
+    depends_on:
+      broker:
+        condition: service_healthy
