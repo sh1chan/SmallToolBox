@@ -25,7 +25,10 @@ class UserStatsRepositoryProtocol(Protocol):
 			minio_repository: MinioRepositoryProtocol,
 	) -> None:	...
 
-	async def send_user_stats(self: Self, payload: UserStatsCacheSchema) -> None:	...
+	async def send_user_stats(
+			self: Self,
+			payload: UserStatsCacheSchema,
+	) -> None:	...
 
 
 class UserStatsRespositoryImpl:
@@ -40,7 +43,12 @@ class UserStatsRespositoryImpl:
 		self.aiogram_repository = aiogram_repository
 		self.minio_repository = minio_repository
 
-	async def send_user_stats(self: Self, payload: UserStatsCacheSchema) -> None:
+	async def send_user_stats(
+			self: Self,
+			payload: UserStatsCacheSchema,
+	) -> None:
+		"""
+		"""
 		file_object = self.minio_repository.read_user_stats_file(
 			filename=payload.minio_object_name,
 		)
@@ -51,6 +59,8 @@ class UserStatsRespositoryImpl:
 
 
 def get_user_stats_repository() -> UserStatsRepositoryProtocol:
+	"""
+	"""
 	return UserStatsRespositoryImpl(
 		aiogram_repository=AiogramRepository,
 		minio_repository=MinioRepository,

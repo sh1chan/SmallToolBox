@@ -8,7 +8,7 @@ if not os.environ.get("IS_IN_PRODUCTION_MODE"):
 from faststream import FastStream
 
 from stbcore.core.enums import RabbitRoutingKeysEnum
-from stbcore.schemas.rabbit import GenerateUserStatsInSchema
+from stbcore.schemas.rabbit import GenerateStatsSchema
 from stbcore.infra.redis import Redis
 from stbcore.infra.rabbit import Rabbit
 from stbcore.infra.minio import Minio
@@ -39,11 +39,17 @@ async def terminate():
 
 
 async def main():
+	"""
+	"""
 	app = FastStream(broker=Rabbit.broker)
 
-	@app.broker.subscriber(RabbitRoutingKeysEnum.TG_MESSAGES__USER_STATS)
-	async def send_user_stats(payload: GenerateUserStatsInSchema) -> None:
-		"""Sending user stats from the cache
+	@app.broker.subscriber(
+			subscriber=RabbitRoutingKeysEnum.TG_MESSAGES__USER_STATS,
+	)
+	async def send_user_stats(
+			payload: GenerateStatsSchema,
+	) -> None:
+		""" Sending user stats from the cache
 		"""
 		return await UserStatsService.send_user_stats(payload=payload)
 

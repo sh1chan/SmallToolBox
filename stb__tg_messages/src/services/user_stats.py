@@ -1,7 +1,7 @@
 from typing import Protocol
 from typing import Self
 
-from stbcore.schemas.rabbit import GenerateUserStatsInSchema
+from stbcore.schemas.rabbit import GenerateStatsSchema
 
 from repositories.redis import RedisRepositoryProtocol
 from repositories.redis import RedisRepository
@@ -18,7 +18,7 @@ class UserStatsServiceProtocol(Protocol):
 			rabbit_repository: RabbitRepositoryProtocol,
 			user_stats_repository: UserStatsRepositoryProtocol,
 	):	...
-	async def send_user_stats(self: Self, payload: GenerateUserStatsInSchema) -> None:	...
+	async def send_user_stats(self: Self, payload: GenerateStatsSchema) -> None:	...
 
 
 class UserStatsServiceImpl:
@@ -32,7 +32,7 @@ class UserStatsServiceImpl:
 		self.rabbit_repository = rabbit_repository
 		self.user_stats_repository = user_stats_repository
 
-	async def send_user_stats(self: Self, payload: GenerateUserStatsInSchema) -> None:
+	async def send_user_stats(self: Self, payload: GenerateStatsSchema) -> None:
 		cache = await self.redis_repository.get_user_stats(user_tg_id=payload.user_tg_id)
 
 		if not cache:
