@@ -3,7 +3,7 @@ from typing import Self
 
 from aiogram.types import Message
 
-from stbcore.schemas.rabbit import GenerateUserStatsInSchema
+from stbcore.schemas.rabbit import GenerateStatsSchema
 
 from .rabbit import RabbitRepository
 from .rabbit import RabbitRepositoryProtocol
@@ -18,7 +18,10 @@ class UserRepositoryProtocol(Protocol):
 			rabbit_repository: RabbitRepositoryProtocol
 	) -> None:	...
 
-	async def send_user_stats(self: Self, message: Message) -> None: ...
+	async def send_user_stats(
+			self: Self,
+			message: Message,
+	) -> None:	...
 
 
 class UserRepositoryImpl:
@@ -35,7 +38,8 @@ class UserRepositoryImpl:
 		"""Publishes a message to send a user stats from the cache
 		"""
 		await self.rabbit_repository.send_user_stats(
-			payload=GenerateUserStatsInSchema(
+			payload=GenerateStatsSchema(
+				chat_tg_id=message.chat.id,
 				user_tg_id=message.from_user.id,
 				message_tg_id=message.message_id,
 			),
