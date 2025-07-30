@@ -3,8 +3,9 @@ from typing import Self
 
 from aiogram.types import input_file
 
-from stbcore.schemas.redis import	UserStatsCacheSchema
-from stbcore.infra.aiogram import	Aiogram
+from stbcore.schemas.redis import UserStatsCacheSchema
+from stbcore.schemas.redis import ChatStatsCacheSchema
+from stbcore.infra.aiogram import Aiogram
 
 
 __all__ = (
@@ -23,6 +24,12 @@ class AiogramRepositoryProtocol(Protocol):
 			file_object: bytes,
 	) -> None:	...
 
+	async def send_chat_stats(
+			self: Self,
+			payload: ChatStatsCacheSchema,
+			file_object: bytes,
+	) -> None:	...
+
 
 class AiogramRepositoryImpl:
 	"""
@@ -33,6 +40,8 @@ class AiogramRepositoryImpl:
 			payload: UserStatsCacheSchema,
 			file_object: bytes,
 	) -> None:
+		"""
+		"""
 		await Aiogram.bot.send_photo(
 			chat_id=payload.user_tg_id,
 			photo=input_file.BufferedInputFile(
@@ -41,8 +50,25 @@ class AiogramRepositoryImpl:
 			),
 		)
 
+	async def send_chat_stats(
+			self: Self,
+			payload: ChatStatsCacheSchema,
+			file_object: bytes,
+	) -> None:
+		"""
+		"""
+		await Aiogram.bot.send_photo(
+			chat_id=payload.chat_tg_id,
+			photo=input_file.BufferedInputFile(
+				file=file_object,
+				filename=payload.minio_object_name,
+			),
+		)
+
 
 def get_aiogram_repository() -> AiogramRepositoryProtocol:
+	"""
+	"""
 	return AiogramRepositoryImpl()
 
 
