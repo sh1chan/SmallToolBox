@@ -15,6 +15,7 @@ from stbcore.infra.minio import Minio
 from stbcore.infra.aiogram import Aiogram
 
 from services.user_stats import UserStatsService
+from services.chat import ChatService
 
 
 async def initialize():
@@ -43,15 +44,21 @@ async def main():
 	"""
 	app = FastStream(broker=Rabbit.broker)
 
-	@app.broker.subscriber(
-			subscriber=RabbitRoutingKeysEnum.TG_MESSAGES__USER_STATS,
-	)
+	@app.broker.subscriber(RabbitRoutingKeysEnum.TG_MESSAGES__USER_STATS)
 	async def send_user_stats(
 			payload: GenerateStatsSchema,
 	) -> None:
 		""" Sending user stats from the cache
 		"""
 		return await UserStatsService.send_user_stats(payload=payload)
+
+	@app.broker.subscriber(RabbitRoutingKeysEnum.TG_MESSAGES__CHAT_STATS)
+	async def send_chat_stats(
+			payload: GenerateStatsSchema,
+	) -> None:
+		""" Sending user stats from the cache
+		"""
+		return await ChatService.send_chat_stats(payload=payload)
 
 	await app.run()
 

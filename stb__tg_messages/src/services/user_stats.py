@@ -12,16 +12,26 @@ from repositories.user_stats import UserStatsRepositoryProtocol
 
 
 class UserStatsServiceProtocol(Protocol):
+	"""
+	"""
+
 	def __init__(
 			self: Self,
 			redis_repository: RedisRepositoryProtocol,
 			rabbit_repository: RabbitRepositoryProtocol,
 			user_stats_repository: UserStatsRepositoryProtocol,
 	):	...
-	async def send_user_stats(self: Self, payload: GenerateStatsSchema) -> None:	...
+
+	async def send_user_stats(
+			self: Self,
+			payload: GenerateStatsSchema,
+	) -> None:	...
 
 
 class UserStatsServiceImpl:
+	"""
+	"""
+
 	def __init__(
 			self: Self,
 			redis_repository: RedisRepositoryProtocol,
@@ -33,11 +43,14 @@ class UserStatsServiceImpl:
 		self.user_stats_repository = user_stats_repository
 
 	async def send_user_stats(self: Self, payload: GenerateStatsSchema) -> None:
+		"""
+		"""
 		cache = await self.redis_repository.get_user_stats(user_tg_id=payload.user_tg_id)
 
 		if not cache:
-			await self.rabbit_repository.generate_user_stats(payload=payload)
-			return 
+			return await self.rabbit_repository.generate_user_stats(
+				payload=payload,
+			)
 
 		await self.user_stats_repository.send_user_stats(
 			payload=cache,
@@ -45,6 +58,8 @@ class UserStatsServiceImpl:
 
 
 def get_user_stats_service() -> UserStatsServiceProtocol:
+	"""
+	"""
 	return UserStatsServiceImpl(
 		redis_repository=RedisRepository,
 		rabbit_repository=RabbitRepository,
