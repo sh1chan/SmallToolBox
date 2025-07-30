@@ -1,6 +1,6 @@
-from routes.root.router import root_router
-from routes.user.router import user_router
-from routes.chat.router import chat_router
+from .root.router import root_router
+from .user.router import user_router
+from .chat.router import chat_router
 
 
 routers = [

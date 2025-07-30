@@ -4,7 +4,7 @@ from typing import Self
 from stbcore.core.enums import RabbitRoutingKeysEnum
 from stbcore.infra.rabbit import Rabbit
 
-from stbcore.schemas.rabbit import GenerateUserStatsInSchema
+from stbcore.schemas.rabbit import GenerateStatsSchema
 
 
 class RabbitRepositoryProtocol(Protocol):
@@ -13,12 +13,12 @@ class RabbitRepositoryProtocol(Protocol):
 
 	async def send_user_stats(
 			self: Self,
-			payload: GenerateUserStatsInSchema,
+			payload: GenerateStatsSchema,
 	) -> None:	...
 
 	async def send_chat_stats(
 			self: Self,
-			payload: GenerateUserStatsInSchema,
+			payload: GenerateStatsSchema,
 	) -> None:	...
 
 
@@ -28,7 +28,7 @@ class RabbitRepositoryImpl:
 
 	async def send_user_stats(
 			self: Self,
-			payload: GenerateUserStatsInSchema,
+			payload: GenerateStatsSchema,
 	) -> None:
 		"""Publishes a message to send a user stats from the cache
 		"""
@@ -39,7 +39,7 @@ class RabbitRepositoryImpl:
 
 	async def send_chat_stats(
 			self: Self,
-			payload: GenerateUserStatsInSchema,
+			payload: GenerateStatsSchema,
 	) -> None:
 		await Rabbit.broker.publish(
 			message=payload,

@@ -1,15 +1,22 @@
 import datetime
 
 from aiogram import Router
+from aiogram import F
 from aiogram.filters import Command
-from aiogram.types import Message, input_file
+from aiogram.types import Message
+from aiogram.types import input_file
 
 from stbcore.infra.postgres import Postgres
 
-from . import template, crud, stats
+# from . import template, crud, stats
+from src.repositories.chat import ChatRepository
 
 
 chat_router = Router(name=__name__)
+chat_router.message.filter(
+	F.chat,
+	F.chat.id != F.from_user.id,
+)
 
 
 # @router.message(Command("gRegister"))
@@ -21,11 +28,9 @@ chat_router = Router(name=__name__)
 
 @chat_router.message(Command("cStats"))
 async def default_stats(message: Message):
-	chat = message.chat
-	if not chat:
-		return await message.reply(template.CHAT_ONLY_COMMAND)
-	if message.from_user and message.from_user.id == chat.id:
-		return await message.reply(template.CHAT_ONLY_COMMAND)
+	return await ChatRepository.send_chat_stats(
+		message=message,
+	)
 
 	async with Postgres.session_maker() as session:
 		date = (
