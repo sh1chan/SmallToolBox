@@ -12,6 +12,8 @@ user_router.message.filter(F.from_user)
 
 @user_router.message(Command("uStats"))
 async def user_stats(message: Message):
+	"""
+	"""
 	await UserRepository.send_user_stats(
 		message=message,
 	)

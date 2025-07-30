@@ -28,6 +28,8 @@ chat_router.message.filter(
 
 @chat_router.message(Command("cStats"))
 async def default_stats(message: Message):
+	"""
+	"""
 	return await ChatRepository.send_chat_stats(
 		message=message,
 	)

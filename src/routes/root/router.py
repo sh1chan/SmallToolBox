@@ -10,6 +10,8 @@ root_router = Router(name=__name__)
 
 @root_router.message(CommandStart())
 async def command_start_handler(message: types.Message):
+	"""
+	"""
 	user = message.from_user
 	if not user:
 		return await message.answer(template.NOT_IMPLEMENTED)

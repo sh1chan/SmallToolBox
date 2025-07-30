@@ -30,7 +30,7 @@ class RabbitRepositoryImpl:
 			self: Self,
 			payload: GenerateStatsSchema,
 	) -> None:
-		"""Publishes a message to send a user stats from the cache
+		""" Publishes a message to send a user stats from the cache
 		"""
 		await Rabbit.broker.publish(
 			message=payload,
@@ -41,6 +41,8 @@ class RabbitRepositoryImpl:
 			self: Self,
 			payload: GenerateStatsSchema,
 	) -> None:
+		"""
+		"""
 		await Rabbit.broker.publish(
 			message=payload,
 			routing_key=RabbitRoutingKeysEnum.TG_MESSAGES__CHAT_STATS,
