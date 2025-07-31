@@ -1,8 +1,10 @@
 import datetime
 
 
-def redis_user_stats_datetime(format: str = "%Y_%m_%d_%H_%M") -> str:
-	"""Returns user_stats_cache datetime
+def redis_stats_datetime(
+		format: str = "%Y_%m_%d_%H_%M",
+) -> str:
+	""" Returns stats_cache datetime
 	"""
 	date_and_time = datetime.datetime.now().strftime(format=format)
 	# XXX (ames0k0)

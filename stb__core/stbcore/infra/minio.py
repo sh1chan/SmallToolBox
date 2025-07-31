@@ -7,10 +7,14 @@ from stbcore.core.enums import MinioBucketsEmum
 
 
 class Minio:
+	"""
+	"""
 	client: minio.Minio | None = None
 
 	@classmethod
 	def initialize(cls: Self) -> None:
+		"""
+		"""
 		cls.client = minio.Minio(
 			endpoint=settings.minio.endpoint,
 			access_key=settings.minio.access_key,
@@ -18,8 +22,14 @@ class Minio:
 			secure=False,
 			cert_check=False,
 		)
-		if not cls.client.bucket_exists(MinioBucketsEmum.userstats):
-			cls.client.make_bucket(MinioBucketsEmum.userstats)
+
+		for bucket_name in (
+				MinioBucketsEmum.userstats,
+				MinioBucketsEmum.chatstats,
+		):
+			if cls.client.bucket_exists(bucket_name=bucket_name):
+				continue
+			cls.client.make_bucket(bucket_name=bucket_name)
 
 	@classmethod
 	def terminate(cls: Self) -> None:	...
