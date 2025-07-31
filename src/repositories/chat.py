@@ -45,6 +45,7 @@ class ChatRepositoryImpl:
 				chat_tg_id=message.chat.id,
 				user_tg_id=message.from_user.id,
 				message_tg_id=message.message_id,
+				message_date=message.date,
 			),
 		)
 
