@@ -39,7 +39,7 @@ class UserRepositoryImpl:
 		"""
 		await self.rabbit_repository.send_user_stats(
 			payload=GenerateStatsSchema(
-				chat_tg_id=message.chat.id,
+				chat_tg_id=int(f"-100{message.chat.id}"),
 				user_tg_id=message.from_user.id,
 				message_tg_id=message.message_id,
 				message_date=message.date,
