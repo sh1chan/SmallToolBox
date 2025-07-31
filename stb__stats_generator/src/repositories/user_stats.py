@@ -32,43 +32,34 @@ class UserStatsRepositoryImpl:
 
 	def generate(
 			self: Self,
-			user_stats: UserStats | None,
+			user_stats: UserStats,
 	) -> io.BytesIO:
 		"""
 		"""
 		buf = io.BytesIO()
-		draw_legend: bool = False
 
-		if not user_stats:
-			plt.title(f"Chats=0, Messages=0")
+		for cid, chat_data in enumerate(user_stats.data.values()):
+			chat_name = chat_data["chat_name"]
+			messages_count = []
+			for hour in HOURS:
+				mc = chat_data["data"].get(str(hour), 0)
+				messages_count.append(mc)
 			plt.plot(
-				HOURS,
-				[0] * len(HOURS),
-				color=f"C0",
+				HOURS, messages_count,
+				color=f"C{cid}", label=chat_name,
 			)
-		else:
-			plt.title(
-				f"Chats={user_stats.chats_count}, Messages={user_stats.messages_count}"
-			)
-			for cid, chat_data in enumerate(user_stats.data.values()):
-				chat_name = chat_data["chat_name"]
-				messages_count = []
-				for hour in HOURS:
-					mc = chat_data["data"].get(hour, 0)
-					messages_count.append(mc)
-				plt.plot(
-					HOURS, messages_count,
-					color=f"C{cid}", label=chat_name,
-				)
-				draw_legend = True
 
-		if draw_legend:
+		if user_stats.data:
 			plt.legend(title="")
 
 		plt.grid(axis="y")
+		plt.title(
+			f"Chats={user_stats.chats_count}, Messages={user_stats.messages_count}",
+		)
 		plt.xlabel("24-hour clock")
 		plt.ylabel("Sent Messages count in Chats")
 		plt.savefig(buf, format="webp")
+		plt.close()
 
 		return buf
 

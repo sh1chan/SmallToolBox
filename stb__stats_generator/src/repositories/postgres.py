@@ -24,6 +24,12 @@ __all__ = (
 )
 
 
+def parse_h_from_dt(dt: str) -> int:
+	"""
+	"""
+	return dt.split(" ")[1].split(":")[0]
+
+
 class MessageStatsRepositoryProtocol(Protocol):
 	"""
 	"""
@@ -111,6 +117,11 @@ class ChatStatsRepositoryProtocol(Protocol):
 	async def create(
 			self: Self,
 			chat_id: NegativeInt,
+			date: str,
+			users_count: int,
+			messages_count: int,
+			data: defaultdict,
+			filename: str,
 			session: AsyncSession,
 	) -> ChatStats:	...
 
@@ -119,6 +130,12 @@ class ChatStatsRepositoryProtocol(Protocol):
 			chat_id: NegativeInt,
 			session: AsyncSession,
 	) -> ChatStats | None:	...
+
+	async def delete(
+			self: Self,
+			chat_stats_id: NegativeInt,
+			session: AsyncSession,
+	) -> None:	...
 
 
 class ChatStatsRepositoryImpl:
@@ -129,16 +146,21 @@ class ChatStatsRepositoryImpl:
 			self: Self,
 			chat_id: NegativeInt,
 			date: str,
+			users_count: int,
+			messages_count: int,
+			data: defaultdict,
+			filename: str,
 			session: AsyncSession,
 	) -> ChatStats:
 		"""
 		"""
-		# NOTE (ames0k0)
-		#	- `stb__stats_generator` tries to delete the `fake` report filepath
 		chat_stats = ChatStats(
-			chat_id=chat_id,
 			date=date,
-			repost_filepath="fake",
+			users_count=users_count,
+			messages_count=messages_count,
+			data=data,
+			report_filepath=filename,
+			chat_id=chat_id,
 		)
 		session.add(chat_stats)
 		await session.commit()
@@ -162,6 +184,21 @@ class ChatStatsRepositoryImpl:
 			)
 		)
 
+	async def delete(
+			self: Self,
+			chat_stats_id: NegativeInt,
+			session: AsyncSession,
+	) -> None:
+		"""
+		"""
+		await session.execute(
+			delete(
+				ChatStats
+			).where(
+				ChatStats.id == chat_stats_id,
+			)
+		)
+
 
 class UserStatsRepositoryProtocol(Protocol):
 	"""
@@ -174,6 +211,7 @@ class UserStatsRepositoryProtocol(Protocol):
 			messages_count: PositiveInt,
 			data: defaultdict,
 			date: str,
+			filename: str,
 			session: AsyncSession,
 	) -> UserStats:	...
 
@@ -201,6 +239,7 @@ class UserStatsRepositoryImpl:
 			messages_count: PositiveInt,
 			data: defaultdict,
 			date: str,
+			filename: str,
 			session: AsyncSession,
 	) -> UserStats:
 		"""
@@ -211,7 +250,7 @@ class UserStatsRepositoryImpl:
 			data=data or {},
 			date=date,
 			user_id=user_id,
-			report_filepath="fake",
+			report_filepath=filename,
 		)
 		session.add(user_stats)
 		await session.commit()
@@ -241,49 +280,10 @@ class UserStatsRepositoryImpl:
 			delete(
 				UserStats
 			).where(
-				UserStats.id==user_stats_id,
+				UserStats.id == user_stats_id,
 			)
 		)
 		await session.commit()
-
-
-class UserRepositoryProtocol(Protocol):
-	"""
-	"""
-
-	def __init__(
-			self: Self,
-			user_stats_repository: UserStatsRepositoryProtocol,
-	) -> None:	...
-
-	async def delete_user_stats(
-			self: Self,
-			user_stats_id: PositiveInt,
-			session: AsyncSession,
-	) -> None:	...
-
-
-class UserRepositoryImpl:
-	"""
-	"""
-
-	def __init__(
-			self: Self,
-			user_stats_repository: UserStatsRepositoryProtocol,
-	) -> None:
-		self.user_stats_repository = user_stats_repository
-
-	async def delete_user_stats(
-			self: Self,
-			user_stats_id: PositiveInt,
-			session: AsyncSession,
-	) -> None:
-		"""
-		"""
-		await self.user_stats_repository.delete(
-			user_stats_id=user_stats_id,
-			session=session,
-		)
 
 
 class PostgresRepositoryProtocol(Protocol):
@@ -293,7 +293,8 @@ class PostgresRepositoryProtocol(Protocol):
 	def __init__(
 			self: Self,
 			user_stats_repository: UserStatsRepositoryProtocol,
-			chat_repository: ChatStatsRepositoryProtocol,
+			chat_repository: ChatRepositoryProtocol,
+			chat_stats_repository: ChatStatsRepositoryProtocol,
 			message_stats_repository: MessageStatsRepositoryProtocol,
 	) -> None:	...
 
@@ -309,7 +310,16 @@ class PostgresRepositoryProtocol(Protocol):
 			user_tg_id: PositiveInt,
 			date: str,
 			user_stats: UserStats | None,
+			filename: str,
 	) -> UserStats:	...
+
+	async def create_chat_stats(
+			self: Self,
+			chat_tg_id: PositiveInt,
+			date: str,
+			chat_stats: ChatStats | None,
+			filename: str,
+	) -> ChatStats:	...
 
 	async def read_user_stats(
 			self: Self,
@@ -317,14 +327,11 @@ class PostgresRepositoryProtocol(Protocol):
 			date: str,
 	) -> UserStats | None:	...
 
-	async def update_user_stats_filename(self: Self, user_stats_id: PositiveInt, filename: str) -> None:	...
-
-	async def update_chat_stats(
+	async def read_chat_stats(
 			self: Self,
-			chat_id: NegativeInt,
+			chat_tg_id: NegativeInt,
 			date: str,
-			session: AsyncSession,
-	) -> None:	...
+	) -> ChatStats | None:	...
 
 
 class PostgresRepositoryImpl:
@@ -334,35 +341,21 @@ class PostgresRepositoryImpl:
 	def __init__(
 			self: Self,
 			user_stats_repository: UserStatsRepositoryProtocol,
-			chat_repository: ChatStatsRepositoryProtocol,
+			chat_repository: ChatRepositoryProtocol,
+			chat_stats_repository: ChatStatsRepositoryProtocol,
 			message_stats_repository: MessageStatsRepositoryProtocol,
 	) -> None:
 		self.user_stats_repository = user_stats_repository
 		self.chat_repository = chat_repository
+		self.chat_stats_repository = chat_stats_repository
 		self.message_stats_repository = message_stats_repository
-
-	async def read_hourly_message_stats(
-			self: Self,
-			session: AsyncSession,
-			user_tg_id: PositiveInt,
-			hourly_stats_date: str
-	) -> Sequence[MessageStats]:
-		"""
-		"""
-		return (await session.execute(
-			select(
-				MessageStats
-			).where(
-				MessageStats.user_id == user_tg_id,
-				MessageStats.date == hourly_stats_date,
-			)
-		)).scalars()
 
 	async def create_user_stats(
 			self: Self,
 			user_tg_id: PositiveInt,
 			date: str,
 			user_stats: UserStats | None,
+			filename: str,
 	) -> UserStats:
 		"""
 		"""
@@ -389,6 +382,7 @@ class PostgresRepositoryImpl:
 					daily_message_stats,
 					key=lambda x: x.chat_id,
 			):
+				messages_count = {}
 				all_chats_count += 1
 				chat = await self.chat_repository.read(
 					chat_id=chat_id,
@@ -399,11 +393,9 @@ class PostgresRepositoryImpl:
 					# TODO (ames0k0): Add to the database ?!
 					continue
 
-				messages_count = {}
 				for ms in chat_ms:
 					all_messages_count += ms.message_count
-					message_h_from_date = ms.date.split(" ")[1].split(":")[0]
-					messages_count[int(message_h_from_date)] = ms.message_count
+					messages_count[parse_h_from_dt(ms.date)] = ms.message_count
 
 				gen_data[chat_id]["chat_name"] = chat.full_name
 				gen_data[chat_id]["data"] = messages_count
@@ -414,8 +406,77 @@ class PostgresRepositoryImpl:
 				messages_count=all_messages_count,
 				data=gen_data,
 				date=date,
+				filename=filename,
 				session=session,
 			)
+
+	async def create_chat_stats(
+			self: Self,
+			chat_tg_id: PositiveInt,
+			date: str,
+			chat_stats: ChatStats | None,
+			filename: str,
+	) -> ChatStats:
+		"""
+		"""
+		async with Postgres.session_maker() as session:
+			if chat_stats:
+				await self.chat_stats_repository.delete(
+					chat_stats_id=chat_stats.id,
+					session=session,
+				)
+
+			chat = await self.chat_repository.read(
+				chat_id=chat_tg_id,
+				session=session,
+			)
+			daily_message_stats = await self.message_stats_repository.read(
+				user_id=None,
+				chat_id=chat_tg_id,
+				date=date,
+				session=session,
+			)
+
+			gen_data = {
+				"chat_name": chat.full_name,
+				"users_count": 0,
+				"messages_count": 0,
+				"data": {},
+			}
+			all_users_count = set()
+			all_messages_count = 0
+
+			for date_value, date_ms in groupby(
+					daily_message_stats,
+					key=lambda x: parse_h_from_dt(x.date),
+			):
+				users_count = set()
+				messages_count = 0
+
+				for ms in date_ms:
+					users_count.add(ms.user_id)
+					messages_count += ms.message_count
+
+				all_messages_count += messages_count
+				gen_data["data"][date_value] = {
+					"users_count": len(users_count),
+					"messages_count": messages_count,
+				}
+				all_users_count.update(users_count)
+				users_count.clear()
+
+			gen_data["users_count"] = len(all_users_count)
+			gen_data["messages_count"] = all_messages_count
+
+		return await self.chat_stats_repository.create(
+			chat_id=chat_tg_id,
+			date=date,
+			users_count=len(all_users_count),
+			messages_count=all_messages_count,
+			data=gen_data,
+			filename=filename,
+			session=session,
+		)
 
 	async def read_user_stats(
 			self: Self,
@@ -434,20 +495,22 @@ class PostgresRepositoryImpl:
 				)
 			)
 
-	async def update_user_stats_filename(self: Self, user_stats_id: PositiveInt, filename: str) -> None:
+	async def read_chat_stats(
+			self: Self,
+			chat_tg_id: NegativeInt,
+			date: str,
+	) -> ChatStats | None:
 		"""
 		"""
 		async with Postgres.session_maker() as session:
-			await session.execute(
-				update(
-					UserStats
+			return await session.scalar(
+				select(
+					ChatStats
 				).where(
-					UserStats.id == user_stats_id,
-				).values({
-					UserStats.report_filepath: filename,
-				})
+					ChatStats.chat_id == chat_tg_id,
+					ChatStats.date == date,
+				)
 			)
-			await session.commit()
 
 	async def update_chat_stats(
 			self: Self,
@@ -482,18 +545,16 @@ def get_user_stats_repository() -> UserStatsRepositoryProtocol:
 	return UserStatsRepositoryImpl()
 
 
-def get_user_repository() -> UserRepositoryProtocol:
-	"""
-	"""
-	return UserRepositoryImpl(
-		user_stats_repository=UserStatsRepository,
-	)
-
-
 def get_chat_repository() -> ChatRepositoryProtocol:
 	"""
 	"""
 	return ChatRepositoryImpl()
+
+
+def get_chat_stats_repository() -> ChatStatsRepositoryProtocol:
+	"""
+	"""
+	return ChatStatsRepositoryImpl()
 
 
 def get_postgres_repository() -> PostgresRepositoryProtocol:
@@ -502,12 +563,13 @@ def get_postgres_repository() -> PostgresRepositoryProtocol:
 	return PostgresRepositoryImpl(
 		user_stats_repository=UserStatsRepository,
 		chat_repository=ChatRepository,
+		chat_stats_repository=ChatStatsRepository,
 		message_stats_repository=MessageStatsRepository,
 	)
 
 
 MessageStatsRepository = get_message_stats_repository()
 UserStatsRepository = get_user_stats_repository()
-UserRepository = get_user_repository()
 ChatRepository = get_chat_repository()
+ChatStatsRepository = get_chat_stats_repository()
 PostgresRepository = get_postgres_repository()

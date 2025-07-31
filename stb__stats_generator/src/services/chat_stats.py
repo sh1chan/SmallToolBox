@@ -1,9 +1,8 @@
-import datetime
 from typing import Protocol
 from typing import Self
 
 from stbcore.schemas.rabbit import GenerateStatsSchema
-from stbcore.schemas.redis import UserStatsCacheSchema
+from stbcore.schemas.redis import ChatStatsCacheSchema
 
 from repositories.redis import RedisRepositoryProtocol
 from repositories.redis import RedisRepository
@@ -13,17 +12,17 @@ from repositories.postgres import PostgresRepositoryProtocol
 from repositories.postgres import PostgresRepository
 from repositories.minio import MinioRepositoryProtocol
 from repositories.minio import MinioRepository
-from repositories.user_stats import UserStatsRepository
-from repositories.user_stats import UserStatsRepositoryProtocol
+from repositories.chat_stats import ChatStatsRepositoryProtocol
+from repositories.chat_stats import ChatStatsRepository
 
 
 __all__ = (
-	"UserStatsService",
-	"UserStatsServiceProtocol",
+	"ChatStatsService",
+	"ChatStatsServiceProtocol",
 )
 
 
-class UserStatsServiceProtocol(Protocol):
+class ChatStatsServiceProtocol(Protocol):
 	"""
 	"""
 
@@ -33,7 +32,7 @@ class UserStatsServiceProtocol(Protocol):
 			rabbit_repository: RabbitRepositoryProtocol,
 			postgres_repository: PostgresRepositoryProtocol,
 			minio_repository: MinioRepositoryProtocol,
-			user_stats: MinioRepositoryProtocol,
+			chat_stats_repository: ChatStatsRepositoryProtocol,
 	) -> None:	...
 
 	async def generate_cache_and_send(
@@ -42,7 +41,7 @@ class UserStatsServiceProtocol(Protocol):
 	) -> None:	...
 
 
-class UserStatsServiceImpl:
+class ChatStatsServiceImpl:
 	"""
 	"""
 
@@ -52,85 +51,70 @@ class UserStatsServiceImpl:
 			rabbit_repository: RabbitRepositoryProtocol,
 			postgres_repository: PostgresRepositoryProtocol,
 			minio_repository: MinioRepositoryProtocol,
-			user_stats_repository: UserStatsRepositoryProtocol,
+			chat_stats_repository: ChatStatsRepositoryProtocol,
 	) -> None:
 		self.redis_repository = redis_repository
 		self.rabbit_repository = rabbit_repository
 		self.postgres_repository = postgres_repository
 		self.minio_repository = minio_repository
-		self.user_stats_repository = user_stats_repository
+		self.chat_stats_repository = chat_stats_repository
 
 	async def generate_cache_and_send(
 			self: Self,
 			payload: GenerateStatsSchema,
 	) -> None:
-		""" Generates, Caches and Sends the user stats
-
-		Steps
-			- Postgres.load_user_messages()
-			- Generate
-			- Minio.upload
-			- Postgres.update
-			- Redis.cache
-			- Rabbit.send
-
-		Read UserStats
-		Read MessageStats
-		Calculate
-			-> Create / Update UserStats
-		Generate
+		""" Generates, Caches, and Sends the chat stats
 		"""
 		stats_date = payload.message_date.strftime("%Y-%m-%d")
 		filename = f"user_stats_{stats_date}.png"
 
-		user_stats = await self.postgres_repository.read_user_stats(
-			user_tg_id=payload.user_tg_id,
+		chat_stats = await self.postgres_repository.read_chat_stats(
+			chat_tg_id=payload.chat_tg_id,
 			date=stats_date,
 		)
-		if user_stats:
-			self.minio_repository.delete_user_stats_file(
-				filename=user_stats.report_filepath,
+		if chat_stats:
+			self.minio_repository.delete_chat_stats_file(
+				filename=chat_stats.report_filepath,
 			)
 
-		user_stats = await self.postgres_repository.create_user_stats(
-			user_tg_id=payload.user_tg_id,
+		chat_stats = await self.postgres_repository.create_chat_stats(
+			chat_tg_id=payload.chat_tg_id,
 			date=stats_date,
-			user_stats=user_stats,
+			chat_stats=chat_stats,
 			filename=filename,
 		)
 
-		user_stats_file_as_bytes = self.user_stats_repository.generate(
-			user_stats=user_stats,
+		chat_stats_file_as_bytes = self.chat_stats_repository.generate(
+			chat_stats=chat_stats,
 		)
 
-		self.minio_repository.create_user_stats_file(
+		self.minio_repository.create_chat_stats_file(
 			filename=filename,
-			file_as_bytes=user_stats_file_as_bytes,
+			file_as_bytes=chat_stats_file_as_bytes,
 		)
 
-		await self.redis_repository.create_user_stats_cache(
-			payload=UserStatsCacheSchema(
-				user_tg_id=payload.user_tg_id,
+		await self.redis_repository.create_chat_stats_cache(
+			payload=ChatStatsCacheSchema(
+				chat_tg_id=payload.chat_tg_id,
 				minio_object_name=filename,
 			),
 		)
 
-		# Ping service `stb__tg_messages`
-		await self.rabbit_repository.send_user_stats(
+		await self.rabbit_repository.send_chat_stats(
 			payload=payload,
 		)
 
 
-def get_user_stats_service() -> UserStatsServiceProtocol:
+def get_chat_stats_service() -> ChatStatsServiceProtocol:
 	"""
 	"""
-	return UserStatsServiceImpl(
-		redis_repository=RedisRepository,
+	return ChatStatsServiceImpl(
+	 	redis_repository=RedisRepository,
 		rabbit_repository=RabbitRepository,
 		postgres_repository=PostgresRepository,
 		minio_repository=MinioRepository,
-		user_stats_repository=UserStatsRepository,
+		chat_stats_repository=ChatStatsRepository,
 	)
 
 
-UserStatsService = get_user_stats_service()
+ChatStatsService = get_chat_stats_service()

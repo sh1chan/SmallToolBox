@@ -8,13 +8,14 @@ if not os.environ.get("IS_IN_PRODUCTION_MODE"):
 from faststream import FastStream
 
 from stbcore.core.enums import RabbitRoutingKeysEnum
-from stbcore.schemas.rabbit import GenerateUserStatsInSchema
+from stbcore.schemas.rabbit import GenerateStatsSchema
 from stbcore.infra.redis import Redis
 from stbcore.infra.rabbit import Rabbit
 from stbcore.infra.postgres import Postgres
 from stbcore.infra.minio import Minio
 
 from services.user_stats import UserStatsService
+from services.chat_stats import ChatStatsService
 
 
 async def initialize():
@@ -43,10 +44,18 @@ async def main():
 	app = FastStream(broker=Rabbit.broker)
 
 	@app.broker.subscriber(RabbitRoutingKeysEnum.STATS_GENERATOR__USER_STATS)
-	async def generate_user_stats(payload: GenerateUserStatsInSchema) -> None:
-		"""Generates user stats, caches and sends
+	async def generate_user_stats(payload: GenerateStatsSchema) -> None:
+		""" Generates user stats, caches and sends
 		"""
 		return await UserStatsService.generate_cache_and_send(
+			payload=payload,
+		)
+
+	@app.broker.subscriber(RabbitRoutingKeysEnum.STATS_GENERATOR__CHAT_STATS)
+	async def generate_chat_stats(payload: GenerateStatsSchema) -> None:
+		""" Generates chat stats, caches and sends
+		"""
+		return await ChatStatsService.generate_cache_and_send(
 			payload=payload,
 		)
 
