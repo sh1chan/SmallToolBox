@@ -1,9 +1,7 @@
 import datetime
-import logging
 from typing import Protocol
 from typing import Self
 
-from stbcore.models.user import UserStats
 from stbcore.schemas.rabbit import GenerateUserStatsInSchema
 from stbcore.schemas.redis import	UserStatsCacheSchema
 
@@ -20,6 +18,9 @@ from repositories.user_stats import UserStatsRepositoryProtocol
 
 
 class UserStatsServiceProtocol(Protocol):
+	"""
+	"""
+
 	def __init__(
 			self: Self,
 			redis_repository: RedisRepositoryProtocol,
@@ -28,10 +29,17 @@ class UserStatsServiceProtocol(Protocol):
 			minio_repository: MinioRepositoryProtocol,
 			user_stats: MinioRepositoryProtocol,
 	) -> None:	...
-	def generate_cache_and_send(self: Self, payload: GenerateUserStatsInSchema) -> None:	...
+
+	def generate_cache_and_send(
+			self: Self,
+			payload: GenerateUserStatsInSchema,
+	) -> None:	...
 
 
 class UserStatsServiceImpl:
+	"""
+	"""
+
 	def __init__(
 			self: Self,
 			redis_repository: RedisRepositoryProtocol,
@@ -114,6 +122,8 @@ class UserStatsServiceImpl:
 
 
 def get_user_stats_service() -> UserStatsServiceProtocol:
+	"""
+	"""
 	return UserStatsServiceImpl(
 		redis_repository=RedisRepository,
 		rabbit_repository=RabbitRepository,
