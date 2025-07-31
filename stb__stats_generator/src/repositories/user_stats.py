@@ -20,14 +20,20 @@ class UserStatsRepositoryProtocol(Protocol):
 	"""
 	"""
 
-	def generate(self: Self, user_stats: UserStats | None) -> io.BytesIO:	...
+	def generate(
+			self: Self,
+			user_stats: UserStats | None,
+	) -> io.BytesIO:	...
 
 
 class UserStatsRepositoryImpl:
 	"""
 	"""
 
-	def generate(self: Self, user_stats: UserStats | None) -> io.BytesIO:
+	def generate(
+			self: Self,
+			user_stats: UserStats | None,
+	) -> io.BytesIO:
 		"""
 		"""
 		buf = io.BytesIO()
@@ -67,4 +73,10 @@ class UserStatsRepositoryImpl:
 		return buf
 
 
-UserStatsRepository = UserStatsRepositoryImpl()
+def get_user_stats_repository() -> UserStatsRepositoryProtocol:
+	"""
+	"""
+	return UserStatsRepositoryImpl()
+
+
+UserStatsRepository = get_user_stats_repository()

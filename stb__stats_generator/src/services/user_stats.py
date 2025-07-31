@@ -2,8 +2,8 @@ import datetime
 from typing import Protocol
 from typing import Self
 
-from stbcore.schemas.rabbit import GenerateUserStatsInSchema
-from stbcore.schemas.redis import	UserStatsCacheSchema
+from stbcore.schemas.rabbit import GenerateStatsSchema
+from stbcore.schemas.redis import UserStatsCacheSchema
 
 from repositories.redis import RedisRepositoryProtocol
 from repositories.redis import RedisRepository
@@ -32,7 +32,7 @@ class UserStatsServiceProtocol(Protocol):
 
 	def generate_cache_and_send(
 			self: Self,
-			payload: GenerateUserStatsInSchema,
+			payload: GenerateStatsSchema,
 	) -> None:	...
 
 
@@ -54,8 +54,11 @@ class UserStatsServiceImpl:
 		self.minio_repository = minio_repository
 		self.user_stats_repository = user_stats_repository
 
-	async def generate_cache_and_send(self: Self, payload: GenerateUserStatsInSchema) -> None:
-		"""Generates caches and sends the user stats
+	async def generate_cache_and_send(
+			self: Self,
+			payload: GenerateStatsSchema,
+	) -> None:
+		""" Generates caches and sends the user stats
 
 		Steps
 			- Postgres.load_user_messages()
@@ -71,11 +74,7 @@ class UserStatsServiceImpl:
 			-> Create / Update UserStats
 		Generate
 		"""
-		# TODO (ames0k0): Load `date` from `payload`
-		date = datetime.datetime.today().strftime(
-			"%Y-%m-%d %H"
-		)
-		stats_date, _ = date.split()
+		stats_date = payload.message_date.strftime("%Y-%m-%d")
 
 		user_stats = await self.postgres_repository.read_user_stats(
 			user_tg_id=payload.user_tg_id,
