@@ -94,10 +94,14 @@ services:
     container_name: stb__tg_messages
     network_mode: host
     restart: unless-stopped
+    env_file:
+      - .env
     depends_on:
       rabbitmq:
         condition: service_healthy
       redis:
+        condition: service_started
+      minio:
         condition: service_started
       stb__core:
         condition: service_completed_successfully
