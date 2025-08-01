@@ -6,7 +6,7 @@ from enum import auto
 class KafkaTopicsEnum(StrEnum):
 	"""
 	"""
-	STB_EVENTS = auto()
+	stb_events = auto()
 
 
 class RabbitRoutingKeysEnum(StrEnum):

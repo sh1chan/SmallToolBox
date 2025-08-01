@@ -10,19 +10,25 @@ class KafkaRepositoryProtocol(Protocol):
 	"""
 	"""
 
-	async def publish_event(self: Self, payload: TelegramMessageEventSchema) -> None:	...
+	async def publish_event(
+			self: Self,
+			payload: TelegramMessageEventSchema,
+	) -> None:	...
 
 
 class KafkaRepositoryImpl:
 	"""
 	"""
 
-	async def publish_event(self: Self, payload: TelegramMessageEventSchema) -> None:
+	async def publish_event(
+			self: Self,
+			payload: TelegramMessageEventSchema,
+	) -> None:
 		"""
 		"""
 		await Kafka.broker.publish(
 			message=payload,
-			topic=KafkaTopicsEnum.STB_EVENTS,
+			topic=KafkaTopicsEnum.stb_events,
 		)
 
 

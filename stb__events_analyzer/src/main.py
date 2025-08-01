@@ -34,7 +34,7 @@ async def main():
 	"""
 	app = FastStream(broker=Kafka.broker)
 
-	@app.broker.subscriber(KafkaTopicsEnum.STB_EVENTS)
+	@app.broker.subscriber(KafkaTopicsEnum.stb_events)
 	async def message_events_analyzer(payload: TelegramMessageEventSchema) -> None:
 		"""Analyzes the message events
 		"""
