@@ -7,3 +7,6 @@
 
 .vscode
 __pycache__
+
+# docker-compose
+volumes

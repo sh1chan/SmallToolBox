@@ -2,13 +2,12 @@
 # - Remove the `network_mode`
 # - Set the images version
 # - Change the Services and Containers name
-# - Add Volumes
 
 services:
 
-  broker:
+  stb__kafka_broker:
     image: apache/kafka:latest
-    container_name: broker
+    container_name: stb__kafka_broker
     network_mode: host
     restart: unless-stopped
     environment:
@@ -33,9 +32,9 @@ services:
       timeout: 5s
       retries: 5
 
-  rabbitmq:
+  stb__rabbitmq:
     image: rabbitmq:latest
-    container_name: rabbitmq
+    container_name: stb__rabbitmq
     network_mode: host
     restart: unless-stopped
     environment:
@@ -47,9 +46,10 @@ services:
       timeout: 5s
       retries: 5
 
-  redis:
+  stb__redis:
     image: redis:latest
-    hostname: redis
+    container_name: stb__redis
+    hostname: stb__redis
     restart: always
     network_mode: host
     environment:
@@ -57,12 +57,32 @@ services:
       REDIS_PORT: 6379
       REDIS_DB: 0
 
-  minio:
+  stb__minio:
     image: quay.io/minio/minio:latest
     network_mode: host
     restart: unless-stopped
-    container_name: minio
+    container_name: stb__minio
     command: ["minio", "server", "data"]
+
+  stb__postgres:
+    image: postgres
+    container_name: stb__postgres
+    environment:
+      POSTGRES_PASSWORD: simple
+      POSTGRES_DB: small_tool_box
+      POSTGRES_USER: postgres
+      PGDATA: /var/lib/postgresql/data
+    volumes:
+      - ./volumes/pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d small_tool_box"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+    restart: unless-stopped
+    ports:
+      - 5454:5432
 
   stb__core:
     build:
@@ -80,9 +100,9 @@ services:
     env_file:
       - .env
     depends_on:
-      broker:
+      stb__kafka_broker:
         condition: service_healthy
-      rabbitmq:
+      stb__rabbitmq:
         condition: service_healthy
       stb__core:
         condition: service_completed_successfully
@@ -97,11 +117,11 @@ services:
     env_file:
       - .env
     depends_on:
-      rabbitmq:
+      stb__rabbitmq:
         condition: service_healthy
-      redis:
+      stb__redis:
         condition: service_started
-      minio:
+      stb__minio:
         condition: service_started
       stb__core:
         condition: service_completed_successfully
@@ -116,7 +136,9 @@ services:
     env_file:
       - .env
     depends_on:
-      minio:
+      stb__postgres:
+        condition: service_healthy
+      stb__minio:
         condition: service_started
       stb__tg_messages:
         condition: service_started
@@ -131,5 +153,7 @@ services:
     env_file:
       - .env
     depends_on:
-      broker:
+      stb__kafka_broker:
+        condition: service_healthy
+      stb__postgres:
         condition: service_healthy
