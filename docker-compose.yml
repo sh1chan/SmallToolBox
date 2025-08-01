@@ -28,7 +28,7 @@ services:
       KAFKA_CREATE_TOPICS: "stb_events"
       AUTO_CREATE_TOPICS: "true"
     healthcheck:
-      test: ["CMD", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092"]
+      test: ["CMD", "/opt/kafka/bin/kafka-broker-api-versions.sh", "--bootstrap-server", "localhost:9092"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -69,7 +69,23 @@ services:
       context: stb__core
     image: stb__core:v0.1.0
     container_name: stb__core
+
+  stb__tg_bot:
+    build:
+      context: .
+    image: stb__tg_bot:v0.1.0
+    container_name: stb__tg_bot
+    network_mode: host
     restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      broker:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      stb__core:
+        condition: service_completed_successfully
 
   stb__tg_messages:
     build:
@@ -84,7 +100,7 @@ services:
       redis:
         condition: service_started
       stb__core:
-        condition: service_started
+        condition: service_completed_successfully
 
   stb__stats_generator:
     build:
@@ -96,8 +112,10 @@ services:
     env_file:
       - .env
     depends_on:
-      - stb__tg_messages
-      - minio
+      minio:
+        condition: service_started
+      stb__tg_messages:
+        condition: service_started
 
   stb__events_analyzer:
     build:
