@@ -1,3 +1,13 @@
+""" Chat Router Repository
+"""
+
+
+__all__ = (
+	"ChatRepository",
+	"ChatRepositoryProtocol",
+)
+
+
 from typing import Protocol
 from typing import Self
 

@@ -1,4 +1,3 @@
-
 WELCOME = """
 Welcome, {NAME}!
 
@@ -16,6 +15,5 @@ Basic Event handlers, Profile Card
 - Information available to Bots
 - Profile Card
 """
-
 
 NOT_IMPLEMENTED = "sry, Not Implemented Yet!"

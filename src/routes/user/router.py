@@ -7,7 +7,9 @@ from src.repositories.user import UserRepository
 
 
 user_router = Router(name=__name__)
-user_router.message.filter(F.from_user)
+user_router.message.filter(
+	F.from_user,
+)
 
 
 @user_router.message(Command("uStats"))

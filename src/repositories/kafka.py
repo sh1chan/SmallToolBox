@@ -1,3 +1,13 @@
+""" Kafka Infra Repository
+"""
+
+
+__all__ = (
+	"KafkaRepository",
+	"KafkaRepositoryProtocol",
+)
+
+
 from typing import Protocol
 from typing import Self
 

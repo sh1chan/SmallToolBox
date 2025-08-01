@@ -1,3 +1,13 @@
+""" User Router Repository
+"""
+
+
+__all__ = (
+	"UserRepository",
+	"UserRepositoryProtocol",
+)
+
+
 from typing import Protocol
 from typing import Self
 

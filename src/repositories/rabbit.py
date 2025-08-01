@@ -1,3 +1,13 @@
+""" Rabbit Infra Repository
+"""
+
+
+__all__ = (
+	"RabbitRepository",
+	"RabbitRepositoryProtocol",
+)
+
+
 from typing import Protocol
 from typing import Self
 
@@ -49,4 +59,10 @@ class RabbitRepositoryImpl:
 		)
 
 
-RabbitRepository = RabbitRepositoryImpl()
+def get_rabbit_repository() -> RabbitRepositoryProtocol:
+	"""
+	"""
+	return RabbitRepositoryImpl()
+
+
+RabbitRepository = get_rabbit_repository()

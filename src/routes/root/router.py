@@ -1,4 +1,6 @@
-from aiogram import Router, html, types
+from aiogram import Router
+from aiogram import html
+from aiogram import types
 from aiogram.filters import CommandStart
 
 from src.repositories.root import RootRepository
@@ -24,6 +26,8 @@ async def command_start_handler(message: types.Message):
 
 
 async def dump_private_chat_message(message: types.Message):
+	"""
+	"""
 	await message.reply_document(
 		document=types.BufferedInputFile(
 			file=message.model_dump_json(
@@ -40,7 +44,7 @@ async def dump_private_chat_message(message: types.Message):
 
 @root_router.message()
 async def any_message(message: types.Message):
-	"""Any Messages
+	""" Any Messages
 
 	User
 		- check user_message_settings
