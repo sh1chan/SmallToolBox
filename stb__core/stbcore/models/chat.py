@@ -1,3 +1,14 @@
+""" Chat Related Models
+"""
+
+
+__all__ = (
+	"Chat",
+	"ChatSettings",
+	"ChatStats",
+)
+
+
 from typing import Optional
 
 from sqlalchemy import ForeignKey
@@ -9,6 +20,10 @@ from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
 from stbcore.models.base import Base
+
+# TODO (ames0k0)
+#	- Add `Model` suffix, e.g. `ChatModel`
+# - Use `Date` Type
 
 
 class Chat(Base):
@@ -45,7 +60,7 @@ class ChatSettings(Base):
 
 
 class ChatStats(Base):
-	"""Cache
+	""" Daily Cache
 	"""
 	__tablename__ = "tgbot_chat_stats"
 

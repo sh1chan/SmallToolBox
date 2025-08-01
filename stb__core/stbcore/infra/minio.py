@@ -1,3 +1,12 @@
+""" MinIO Infra
+"""
+
+
+__all__ = (
+	"Minio",
+)
+
+
 from typing import Self
 
 import minio
@@ -32,4 +41,6 @@ class Minio:
 			cls.client.make_bucket(bucket_name=bucket_name)
 
 	@classmethod
-	def terminate(cls: Self) -> None:	...
+	def terminate(cls: Self) -> None:
+		"""
+		"""

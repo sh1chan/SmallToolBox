@@ -1,3 +1,13 @@
+""" Redis Schemas
+"""
+
+
+__all__ = (
+	"UserStatsCacheSchema",
+	"ChatStatsCacheSchema",
+)
+
+
 from pydantic import BaseModel
 from pydantic import PositiveInt
 from pydantic import NegativeInt

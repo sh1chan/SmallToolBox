@@ -1,3 +1,14 @@
+""" User Related Models
+"""
+
+
+__all__ = (
+	"User",
+	"UserSettings",
+	"UserStats",
+)
+
+
 from typing import List
 from typing import TYPE_CHECKING
 from typing import Optional
@@ -37,6 +48,8 @@ class User(Base):
 
 
 class UserSettings(Base):
+	"""
+	"""
 	__tablename__ = "tgbot_user_settings"
 
 	id: Mapped[int] = mapped_column(primary_key=True)
@@ -55,6 +68,8 @@ class UserSettings(Base):
 
 
 class UserChat(Base):
+	"""
+	"""
 	__tablename__ = "tgbot_user_chat"
 
 	id: Mapped[int] = mapped_column(
@@ -71,7 +86,7 @@ class UserChat(Base):
 
 
 class UserStats(Base):
-	"""Cache
+	""" Cache
 	"""
 	__tablename__ = "tgbot_user_stats"
 

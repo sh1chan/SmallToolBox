@@ -1,3 +1,13 @@
+""" Message Related Models
+"""
+
+
+__all__ = (
+	"Message",
+	"MessageStats",
+)
+
+
 from sqlalchemy import ForeignKey
 from sqlalchemy import BigInteger
 from sqlalchemy import String
@@ -23,6 +33,8 @@ class Message(Base):
 
 
 class MessageStats(Base):
+	""" Message Stats Model
+	"""
 	__tablename__ = "tgbot_message_stats"
 
 	id: Mapped[int] = mapped_column(primary_key=True)
