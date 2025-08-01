@@ -1,9 +1,18 @@
+""" User Router
+"""
+
+
+__all__ = (
+	"user_router",
+)
+
+
 from aiogram import Router
 from aiogram import F
 from aiogram.types import Message
 from aiogram.filters import Command
 
-from src.repositories.user import UserRepository
+from repositories.user import UserRepository
 
 
 user_router = Router(name=__name__)

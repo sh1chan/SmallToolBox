@@ -1,9 +1,18 @@
+""" Root Router
+"""
+
+
+__all__ = (
+	"root_router",
+)
+
+
 from aiogram import Router
 from aiogram import html
 from aiogram import types
 from aiogram.filters import CommandStart
 
-from src.repositories.root import RootRepository
+from repositories.root import RootRepository
 from . import template
 
 

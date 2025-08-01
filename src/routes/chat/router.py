@@ -1,9 +1,18 @@
+""" Chat Router
+"""
+
+
+__all__ = (
+	"chat_router",
+)
+
+
 from aiogram import Router
 from aiogram import F
 from aiogram.filters import Command
 from aiogram.types import Message
 
-from src.repositories.chat import ChatRepository
+from repositories.chat import ChatRepository
 
 
 chat_router = Router(name=__name__)
