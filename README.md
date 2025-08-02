@@ -20,11 +20,10 @@ poetry run python -V  # Python 3.11.6
 </details>
 
 ```
-# Set an Environment variables: $TOKEN, $POSTGRESQL_URI
+# Set an Environment variable: $TGBOT__TOKEN
 cp .env-EXAMPLE .env
 
-poetry install
-poetry run python main.py
+docker compose up -d
 ```
 
 #### Versions
