@@ -11,7 +11,6 @@ from pydantic import BaseModel
 from pydantic import RedisDsn
 from pydantic import AmqpDsn
 from pydantic import PostgresDsn
-from pydantic import AnyUrl
 from pydantic import computed_field
 from pydantic_settings import BaseSettings
 from pydantic_settings import SettingsConfigDict
@@ -59,7 +58,7 @@ class Rabbit(BaseModel):
 class Kafka(BaseModel):
 	"""
 	"""
-	BOOTSTRAP_SERVERS: AnyUrl
+	BOOTSTRAP_SERVERS: str
 
 	@computed_field
 	@property

@@ -24,7 +24,7 @@ class Kafka:
 		"""
 		"""
 		cls.broker = KafkaBroker(bootstrap_servers=settings.kafka.bootstrap_servers)
-		await cls.broker.connect()
+		await cls.broker.connect(bootstrap_servers=settings.kafka.bootstrap_servers)
 
 	@classmethod
 	async def terminate(cls: Self) -> None:
