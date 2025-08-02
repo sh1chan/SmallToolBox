@@ -1,20 +1,18 @@
 # TODO (ames0k0)
-# - Remove the `network_mode`
 # - Set the images version
 # - Change the Services and Containers name
 
 services:
 
-  stb__kafka_broker:
+  stb--kafka_broker:
     image: apache/kafka:latest
-    container_name: stb__kafka_broker
-    network_mode: host
+    container_name: stb--kafka_broker
     restart: unless-stopped
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
-      KAFKA_LISTENERS: PLAINTEXT://localhost:9092,CONTROLLER://localhost:9093
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_LISTENERS: PLAINTEXT://stb--kafka_broker:9092,CONTROLLER://localhost:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://stb--kafka_broker:9092
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
@@ -27,15 +25,14 @@ services:
       KAFKA_CREATE_TOPICS: "stb_events"
       AUTO_CREATE_TOPICS: "true"
     healthcheck:
-      test: ["CMD", "/opt/kafka/bin/kafka-broker-api-versions.sh", "--bootstrap-server", "localhost:9092"]
+      test: ["CMD", "/opt/kafka/bin/kafka-broker-api-versions.sh", "--bootstrap-server", "stb--kafka_broker:9092"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  stb__rabbitmq:
+  stb--rabbitmq:
     image: rabbitmq:latest
-    container_name: stb__rabbitmq
-    network_mode: host
+    container_name: stb--rabbitmq
     restart: unless-stopped
     environment:
       RABBITMQ_DEFAULT_USER: user
@@ -46,27 +43,24 @@ services:
       timeout: 5s
       retries: 5
 
-  stb__redis:
+  stb--redis:
     image: redis:latest
-    container_name: stb__redis
-    hostname: stb__redis
+    container_name: stb--redis
     restart: always
-    network_mode: host
     environment:
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_DB: 0
 
-  stb__minio:
+  stb--minio:
     image: quay.io/minio/minio:latest
-    network_mode: host
     restart: unless-stopped
-    container_name: stb__minio
+    container_name: stb--minio
     command: ["minio", "server", "data"]
 
-  stb__postgres:
+  stb--postgres:
     image: postgres
-    container_name: stb__postgres
+    container_name: stb--postgres
     environment:
       POSTGRES_PASSWORD: simple
       POSTGRES_DB: small_tool_box
@@ -81,8 +75,6 @@ services:
       start_period: 30s
       timeout: 10s
     restart: unless-stopped
-    ports:
-      - 5454:5432
 
   stb__core:
     build:
@@ -95,14 +87,13 @@ services:
       context: .
     image: stb__tg_bot:v0.1.0
     container_name: stb__tg_bot
-    network_mode: host
     restart: unless-stopped
     env_file:
       - .env
     depends_on:
-      stb__kafka_broker:
+      stb--kafka_broker:
         condition: service_healthy
-      stb__rabbitmq:
+      stb--rabbitmq:
         condition: service_healthy
       stb__core:
         condition: service_completed_successfully
@@ -112,16 +103,15 @@ services:
       context: stb__tg_messages
     image: stb__tg_messages:v0.1.0
     container_name: stb__tg_messages
-    network_mode: host
     restart: unless-stopped
     env_file:
       - .env
     depends_on:
-      stb__rabbitmq:
+      stb--rabbitmq:
         condition: service_healthy
-      stb__redis:
+      stb--redis:
         condition: service_started
-      stb__minio:
+      stb--minio:
         condition: service_started
       stb__core:
         condition: service_completed_successfully
@@ -131,15 +121,12 @@ services:
       context: stb__stats_generator
     image: stb__stats_generator:v0.1.0
     container_name: stb__stats_generator
-    network_mode: host
     restart: unless-stopped
     env_file:
       - .env
     depends_on:
-      stb__postgres:
+      stb--postgres:
         condition: service_healthy
-      stb__minio:
-        condition: service_started
       stb__tg_messages:
         condition: service_started
 
@@ -148,12 +135,11 @@ services:
       context: stb__events_analyzer
     image: stb__events_analyzer:v0.1.0
     container_name: stb__events_analyzer
-    network_mode: host
     restart: unless-stopped
     env_file:
       - .env
     depends_on:
-      stb__kafka_broker:
+      stb--kafka_broker:
         condition: service_healthy
-      stb__postgres:
+      stb--postgres:
         condition: service_healthy
