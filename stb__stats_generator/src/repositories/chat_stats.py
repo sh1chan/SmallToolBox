@@ -41,7 +41,7 @@ class ChatStatsRepositoryImpl:
 		messages_count = []
 
 		for hour in HOURS:
-			uam = chat_stats.data["data"].get(str(hour), {})
+			uam = chat_stats.data["data"].get(hour, {})
 			users_count.append(
 				uam.get("users_count", 0)
 			)

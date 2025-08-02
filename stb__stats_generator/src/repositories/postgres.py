@@ -27,7 +27,7 @@ __all__ = (
 def parse_h_from_dt(dt: str) -> int:
 	"""
 	"""
-	return dt.split(" ")[1].split(":")[0]
+	return int(dt.split(" ")[1].split(":")[0])
 
 
 class MessageStatsRepositoryProtocol(Protocol):

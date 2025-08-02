@@ -42,7 +42,7 @@ class UserStatsRepositoryImpl:
 			chat_name = chat_data["chat_name"]
 			messages_count = []
 			for hour in HOURS:
-				mc = chat_data["data"].get(str(hour), 0)
+				mc = chat_data["data"].get(hour, 0)
 				messages_count.append(mc)
 			plt.plot(
 				HOURS, messages_count,
