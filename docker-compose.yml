@@ -1,6 +1,5 @@
 # TODO (ames0k0)
 # - Set the images version
-# - Change the Services and Containers name
 
 services:
 
@@ -79,13 +78,13 @@ services:
   stb__core:
     build:
       context: stb__core
-    image: stb__core:v0.1.0
+    image: stb__core:v0.2.0
     container_name: stb__core
 
   stb__tg_bot:
     build:
       context: .
-    image: stb__tg_bot:v0.1.0
+    image: stb__tg_bot:v0.2.0
     container_name: stb__tg_bot
     restart: unless-stopped
     env_file:
@@ -101,7 +100,7 @@ services:
   stb__tg_messages:
     build:
       context: stb__tg_messages
-    image: stb__tg_messages:v0.1.0
+    image: stb__tg_messages:v0.2.0
     container_name: stb__tg_messages
     restart: unless-stopped
     env_file:
@@ -119,7 +118,7 @@ services:
   stb__stats_generator:
     build:
       context: stb__stats_generator
-    image: stb__stats_generator:v0.1.0
+    image: stb__stats_generator:v0.2.0
     container_name: stb__stats_generator
     restart: unless-stopped
     env_file:
@@ -129,11 +128,13 @@ services:
         condition: service_healthy
       stb__tg_messages:
         condition: service_started
+      stb__core:
+        condition: service_completed_successfully
 
   stb__events_analyzer:
     build:
       context: stb__events_analyzer
-    image: stb__events_analyzer:v0.1.0
+    image: stb__events_analyzer:v0.2.0
     container_name: stb__events_analyzer
     restart: unless-stopped
     env_file:
@@ -143,3 +144,5 @@ services:
         condition: service_healthy
       stb--postgres:
         condition: service_healthy
+      stb__core:
+        condition: service_completed_successfully

@@ -1,4 +1,4 @@
-FROM stb__core:v0.1.0
+FROM stb__core:v0.2.0
 
 WORKDIR /events_analyzer
 
